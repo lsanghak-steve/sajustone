@@ -78,6 +78,113 @@ h1 {
   line-height: 1.7;
 }
 
+
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.primary-link,
+.ghost-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 6px;
+  padding: 0 18px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.primary-link {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.ghost-link {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+
+.stones-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.stones-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.gallery-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  box-shadow: var(--shadow);
+}
+
+.gallery-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f2ede4;
+}
+
+.gallery-card div {
+  padding: 20px;
+}
+
+.gallery-card span {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.gallery-card.wood span {
+  background: var(--wood);
+}
+
+.gallery-card.fire span {
+  background: var(--fire);
+}
+
+.gallery-card.earth span {
+  background: var(--earth);
+}
+
+.gallery-card.metal span {
+  background: var(--metal);
+}
+
+.gallery-card.water span {
+  background: var(--water);
+}
+
+.gallery-card h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.gallery-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
 .element-wheel {
   position: relative;
   width: 280px;
@@ -294,6 +401,9 @@ h1 {
 }
 
 .pillar-card {
+  display: grid;
+  grid-template-rows: auto 48px 28px auto;
+  align-content: start;
   min-height: 168px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -316,7 +426,8 @@ h1 {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-bottom: 8px;
+  min-height: 48px;
+  margin-bottom: 0;
 }
 
 .pillar-main strong {
@@ -330,11 +441,20 @@ h1 {
   font-weight: 700;
 }
 
+
+.pillar-meta {
+  min-height: 28px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
 .element-tags {
   display: flex;
   flex-wrap: wrap;
+  align-content: start;
   gap: 6px;
-  margin-top: 12px;
+  min-height: 62px;
+  margin-top: 10px;
 }
 
 .tag,
@@ -466,6 +586,45 @@ h1 {
   padding: 18px;
 }
 
+
+.stone-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  background: #f2ede4;
+}
+
+.stone-photo-link {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.stone-photo-link span {
+  position: absolute;
+  right: 10px;
+  bottom: 26px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  background: rgba(29, 28, 25, 0.78);
+  color: #fff;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.stone-photo-link:focus-visible {
+  outline: 3px solid rgba(188, 138, 44, 0.35);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
 .stone-card-head {
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
@@ -672,11 +831,17 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .stones-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .element-wheel {
     width: min(280px, 100%);
     justify-self: center;
   }
 
+  .stones-gallery,
   .stone-list,
   .luck-grid,
   .pillars {
@@ -694,6 +859,7 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .stones-gallery,
   .stone-list,
   .luck-grid,
   .pillars {
@@ -704,7 +870,3 @@ h1 {
     grid-template-columns: 52px minmax(0, 1fr) 34px;
   }
 }
-
-
-
-

@@ -227,6 +227,8 @@ function renderResult(result, input) {
 
 const stoneRecommendations = {
   wood: {
+    image: "./assets/stones/wood-stones.png",
+    pinterestUrl: "https://www.pinterest.com/trueplantlover/all-the-greens-emerald-peridot-aventurine-malachit/",
     title: "목(木) 기운 추천석",
     tone: "초록 계열",
     summary: "성장, 시작, 회복, 기획의 기운을 상징합니다.",
@@ -238,6 +240,8 @@ const stoneRecommendations = {
     tip: "목 기운이 부족할 때는 초록색 포인트나 식물 가까이에 두는 방식이 잘 어울립니다.",
   },
   fire: {
+    image: "./assets/stones/fire-stones.png",
+    pinterestUrl: "https://www.pinterest.com/pin/155303888227152552/",
     title: "화(火) 기운 추천석",
     tone: "붉은 계열",
     summary: "표현, 열정, 활력, 자신감의 기운을 상징합니다.",
@@ -249,6 +253,8 @@ const stoneRecommendations = {
     tip: "화 기운이 부족할 때는 발표, 만남, 중요한 시작이 있는 날에 붉은 계열 스톤을 포인트로 쓰면 좋습니다.",
   },
   earth: {
+    image: "./assets/stones/earth-stones.png",
+    pinterestUrl: "https://www.pinterest.com/pin/855191416774140425/",
     title: "토(土) 기운 추천석",
     tone: "노랑·갈색 계열",
     summary: "안정, 균형, 현실감, 신뢰의 기운을 상징합니다.",
@@ -260,6 +266,8 @@ const stoneRecommendations = {
     tip: "토 기운이 부족할 때는 책상, 지갑, 업무 공간처럼 현실적인 결정을 하는 곳에 두기 좋습니다.",
   },
   metal: {
+    image: "./assets/stones/metal-stones.png",
+    pinterestUrl: "https://www.pinterest.com/pin/927037904516497238/",
     title: "금(金) 기운 추천석",
     tone: "흰색·금속성 계열",
     summary: "정리, 결단, 집중, 보호의 기운을 상징합니다.",
@@ -271,6 +279,8 @@ const stoneRecommendations = {
     tip: "금 기운이 부족할 때는 중요한 선택, 정리, 계약, 계획 수립 시 가까이 두는 방식이 어울립니다.",
   },
   water: {
+    image: "./assets/stones/water-stones.png",
+    pinterestUrl: "https://www.pinterest.com/pin/314548355221287962/",
     title: "수(水) 기운 추천석",
     tone: "파랑·검정 계열",
     summary: "지혜, 유연함, 감정 정화, 휴식의 기운을 상징합니다.",
@@ -298,6 +308,10 @@ function renderStoneRecommendations(deficientElements) {
 
     return `
       <article class="stone-card ${element}">
+        <a class="stone-photo-link" href="${escapeHtml(recommendation.pinterestUrl)}" target="_blank" rel="noopener noreferrer">
+          <img class="stone-photo" src="${escapeHtml(recommendation.image)}" alt="${escapeHtml(recommendation.title)} 이미지">
+          <span>Pinterest 참고 이미지 보기</span>
+        </a>
         <div class="stone-card-head">
           <span class="stone-symbol">${elementInfo[element].hanja}</span>
           <div>
@@ -521,11 +535,3 @@ function renderBars(scores) {
     `;
   }).join("");
 }
-
-
-
-
-
-
-
-
