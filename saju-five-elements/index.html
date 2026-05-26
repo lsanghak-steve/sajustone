@@ -1,0 +1,143 @@
+﻿<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>오행 사주 계산기</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="intro">
+        <div class="intro-copy">
+          <p class="eyebrow">Five Elements Finder</p>
+          <h1>생년월일로 부족한 오행을 확인하세요</h1>
+          <p class="lede">
+            양력 생년월일과 출생시간을 기준으로 사주 기둥을 계산하고 목, 화, 토, 금, 수의 분포를 보여주는 간단형 웹 프로그램입니다.
+          </p>
+        </div>
+        <div class="element-wheel" aria-hidden="true">
+          <span class="wood">木</span>
+          <span class="fire">火</span>
+          <span class="earth">土</span>
+          <span class="metal">金</span>
+          <span class="water">水</span>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form class="panel input-panel" id="saju-form">
+          <div class="panel-head">
+            <p class="eyebrow">Input</p>
+            <h2>조회할 사주 정보</h2>
+          </div>
+
+          <label class="field">
+            <span>이름</span>
+            <input id="name" type="text" placeholder="예: 홍길동" autocomplete="name">
+          </label>
+
+          <div class="segmented" role="radiogroup" aria-label="성별">
+            <label>
+              <input type="radio" name="gender" value="male" checked>
+              <span>남자</span>
+            </label>
+            <label>
+              <input type="radio" name="gender" value="female">
+              <span>여자</span>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>생년월일</span>
+            <input id="birth-date" type="date" required>
+          </label>
+
+          <label class="field">
+            <span>출생시간</span>
+            <input id="birth-time" type="time" value="12:00">
+          </label>
+
+          <label class="check-field">
+            <input id="unknown-time" type="checkbox">
+            <span>출생시간을 모릅니다</span>
+          </label>
+
+          <div class="notice">
+            현재 버전은 양력 기준이며, 절기 시각은 표준 날짜 기준으로 계산합니다. 실제 상담용 만세력과 일부 차이가 날 수 있습니다.
+          </div>
+
+          <div class="actions">
+            <button class="primary-button" type="submit">부족 오행 조회</button>
+            <button class="ghost-button" type="button" id="sample-button">샘플 입력</button>
+          </div>
+        </form>
+
+        <section class="panel result-panel" aria-live="polite">
+          <div class="panel-head">
+            <p class="eyebrow">Result</p>
+            <h2 id="result-title">결과 대기 중</h2>
+          </div>
+
+          <div class="empty-state" id="empty-state">
+            생년월일을 입력하면 사주 기둥과 오행 분포가 이곳에 표시됩니다.
+          </div>
+
+          <div class="result-content hidden" id="result-content">
+            <div class="pillars" id="pillars"></div>
+
+            <div class="summary">
+              <h3>오행 분포</h3>
+              <div class="bars" id="element-bars"></div>
+            </div>
+
+            <div class="recommendation">
+              <p class="label">부족 오행</p>
+              <h3 id="deficient-title"></h3>
+              <p id="deficient-copy"></p>
+            </div>
+
+            <section class="stone-section">
+              <div class="reading-head">
+                <p class="label">천연석 추천</p>
+                <h3>부족한 기운을 보완하는 추천석</h3>
+              </div>
+              <div class="stone-grid" id="stone-cards"></div>
+            </section>
+
+            <section class="luck-section">
+              <div class="reading-head">
+                <p class="label">운세 요약</p>
+                <h3>재물운 · 사업운 · 연애운 · 종합운</h3>
+              </div>
+              <div class="luck-grid" id="luck-cards"></div>
+            </section>
+
+            <section class="luck-section current-year-section">
+              <div class="reading-head">
+                <p class="label">올해 운세</p>
+                <h3 id="current-year-title">현재 년도 운세</h3>
+              </div>
+              <div class="luck-grid" id="current-year-luck-cards"></div>
+            </section>
+
+            <article class="detailed-reading">
+              <div class="reading-head">
+                <p class="label">사주 상세 해설</p>
+                <h3>입력한 생년월일 기준 해석</h3>
+              </div>
+              <div class="reading-body" id="detailed-reading"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
+
+
+
+
