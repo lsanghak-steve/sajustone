@@ -227,66 +227,61 @@ function renderResult(result, input) {
 
 const stoneRecommendations = {
   wood: {
-    image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png",
-    pinterestUrl: "https://www.pinterest.com/trueplantlover/all-the-greens-emerald-peridot-aventurine-malachit/",
+    image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%EB%AA%A9%E6%9C%A8/37/",
     title: "목(木) 기운 추천석",
     tone: "초록 계열",
     summary: "성장, 시작, 회복, 기획의 기운을 상징합니다.",
     stones: [
-      { name: "그린 아벤츄린", color: "#3f9f6a", image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", meaning: "새로운 시작과 안정적인 성장을 상징하는 천연석입니다." },
+      { name: "그린 아벤츄린", color: "#3f9f6a", image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%EB%AA%A9%E6%9C%A8/37/", meaning: "새로운 시작과 안정적인 성장을 상징하는 천연석입니다." },
       { name: "말라카이트", color: "#1f7a4d", image: "./assets/stone-gallery/Malachite.png", bracelet: "./assets/bracelet-gallery/Malachite_bra.png", meaning: "정체된 흐름을 바꾸고 변화의 용기를 돕는 상징석입니다." },
       { name: "페리도트", color: "#8abf45", image: "./assets/stone-gallery/Peridot.png", bracelet: "./assets/bracelet-gallery/Peridot_bra.png", meaning: "가벼운 활력과 긍정적인 회복감을 더하는 데 어울립니다." },
     ],
     tip: "목 기운이 부족할 때는 초록색 포인트나 식물 가까이에 두는 방식이 잘 어울립니다.",
   },
   fire: {
-    image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png",
-    pinterestUrl: "https://www.pinterest.com/pin/155303888227152552/",
+    image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%ED%99%94%E7%81%AB/38/",
     title: "화(火) 기운 추천석",
     tone: "붉은 계열",
     summary: "표현, 열정, 활력, 자신감의 기운을 상징합니다.",
     stones: [
-      { name: "가넷", color: "#8f1d2c", image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", meaning: "집중력과 지속적인 열정을 상징하는 붉은 천연석입니다." },
+      { name: "가넷", color: "#8f1d2c", image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%ED%99%94%E7%81%AB/38/", meaning: "집중력과 지속적인 열정을 상징하는 붉은 천연석입니다." },
       { name: "카넬리안", color: "#d85f2a", image: "./assets/stone-gallery/Carnelian.png", bracelet: "./assets/bracelet-gallery/Carnelian_bra.png", meaning: "표현력과 행동력을 깨우는 따뜻한 에너지의 상징석입니다." },
       { name: "레드 재스퍼", color: "#ad3f32", image: "./assets/stone-gallery/RedJasper.png", bracelet: "./assets/bracelet-gallery/RedJasper_bra.png", meaning: "흔들림 없는 활력과 실행력을 보완하는 데 어울립니다." },
     ],
     tip: "화 기운이 부족할 때는 발표, 만남, 중요한 시작이 있는 날에 붉은 계열 스톤을 포인트로 쓰면 좋습니다.",
   },
   earth: {
-    image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png",
-    pinterestUrl: "https://www.pinterest.com/pin/855191416774140425/",
+    image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%ED%86%A0%E5%9C%9F/39/",
     title: "토(土) 기운 추천석",
     tone: "노랑·갈색 계열",
     summary: "안정, 균형, 현실감, 신뢰의 기운을 상징합니다.",
     stones: [
-      { name: "타이거 아이", color: "#b4772f", image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", meaning: "현실 감각과 중심을 잡는 힘을 상징하는 천연석입니다." },
+      { name: "타이거 아이", color: "#b4772f", image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%ED%86%A0%E5%9C%9F/39/", meaning: "현실 감각과 중심을 잡는 힘을 상징하는 천연석입니다." },
       { name: "시트린", color: "#e0ad32", image: "./assets/stone-gallery/Citrine.png", bracelet: "./assets/bracelet-gallery/Citrine_bra.png", meaning: "밝은 자신감과 결과를 만드는 감각을 보완하는 데 어울립니다." },
       { name: "스모키 쿼츠", color: "#756050", image: "./assets/stone-gallery/SmokyQuartz.png", bracelet: "./assets/bracelet-gallery/SmokyQuartz_bra.png", meaning: "불안정한 마음을 가라앉히고 차분한 판단을 상징합니다." },
     ],
     tip: "토 기운이 부족할 때는 책상, 지갑, 업무 공간처럼 현실적인 결정을 하는 곳에 두기 좋습니다.",
   },
   metal: {
-    image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png",
-    pinterestUrl: "https://www.pinterest.com/pin/927037904516497238/",
+    image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%EA%B8%88%EF%A4%8A/40/",
     title: "금(金) 기운 추천석",
     tone: "흰색·금속성 계열",
     summary: "정리, 결단, 집중, 보호의 기운을 상징합니다.",
     stones: [
-      { name: "클리어 쿼츠", color: "#d9dde0", image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", meaning: "생각을 맑게 정리하고 방향성을 세우는 상징석입니다." },
+      { name: "클리어 쿼츠", color: "#d9dde0", image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%EA%B8%88%EF%A4%8A/40/", meaning: "생각을 맑게 정리하고 방향성을 세우는 상징석입니다." },
       { name: "헤마타이트", color: "#4d5356", image: "./assets/stone-gallery/Hematite.png", bracelet: "./assets/bracelet-gallery/Hematite_bra.png", meaning: "흐트러진 에너지를 모으고 단단한 집중을 돕는 이미지가 있습니다." },
       { name: "화이트 하울라이트", color: "#f0eee8", image: "./assets/stone-gallery/WhiteHowlite.png", bracelet: "./assets/bracelet-gallery/WhiteHowlite_bra.png", meaning: "차분함과 절제, 감정 정리를 상징하는 흰색 계열 천연석입니다." },
     ],
     tip: "금 기운이 부족할 때는 중요한 선택, 정리, 계약, 계획 수립 시 가까이 두는 방식이 어울립니다.",
   },
   water: {
-    image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png",
-    pinterestUrl: "https://www.pinterest.com/pin/314548355221287962/",
+    image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%EC%88%98%E6%B0%B4/41/",
     title: "수(水) 기운 추천석",
     tone: "파랑·검정 계열",
     summary: "지혜, 유연함, 감정 정화, 휴식의 기운을 상징합니다.",
     stones: [
       { name: "아쿠아마린", color: "#7fbfd1", image: "./assets/stone-gallery/Aquamarine.png", bracelet: "./assets/bracelet-gallery/Aquamarine_bra.png", meaning: "부드러운 소통과 감정의 흐름을 상징하는 파란 천연석입니다." },
-      { name: "라피스 라줄리", color: "#264a9b", image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", meaning: "깊은 통찰과 내면의 지혜를 떠올리게 하는 상징석입니다." },
+      { name: "라피스 라줄리", color: "#264a9b", image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", purchaseUrl: "https://mtwey.com/product/%EA%B8%B8%EC%9A%B4-%EC%98%A4%ED%96%89-%EC%97%BC%EC%A3%BC-%EC%88%98%E6%B0%B4/41/", meaning: "깊은 통찰과 내면의 지혜를 떠올리게 하는 상징석입니다." },
       { name: "블랙 옵시디언", color: "#1b1b1d", image: "./assets/stone-gallery/BlackObsidian.png", bracelet: "./assets/bracelet-gallery/BlackObsidian_bra.png", meaning: "복잡한 마음을 비우고 보호의 이미지를 더하는 데 어울립니다." },
     ],
     tip: "수 기운이 부족할 때는 휴식 공간, 명상 시간, 잠들기 전 루틴과 함께 활용하기 좋습니다.",
@@ -299,8 +294,12 @@ function renderStoneRecommendations(deficientElements) {
     const stones = recommendation.stones.map((stone) => `
       <li class="stone-item">
         <div class="stone-media-pair">
-          <img class="stone-thumb" src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)} 원석 이미지">
-          <img class="bracelet-thumb" src="${escapeHtml(stone.bracelet)}" alt="${escapeHtml(stone.name)} 팔찌 이미지">
+          <a class="stone-buy-link" href="${escapeHtml(recommendation.purchaseUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(stone.name)} 팔찌 구매 페이지 새 탭으로 열기">
+            <img class="stone-thumb" src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)} 원석 이미지">
+          </a>
+          <a class="stone-buy-link" href="${escapeHtml(recommendation.purchaseUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(stone.name)} 팔찌 구매 페이지 새 탭으로 열기">
+            <img class="bracelet-thumb" src="${escapeHtml(stone.bracelet)}" alt="${escapeHtml(stone.name)} 팔찌 이미지">
+          </a>
         </div>
         <div class="stone-copy">
           <strong>${escapeHtml(stone.name)}</strong>
@@ -311,10 +310,7 @@ function renderStoneRecommendations(deficientElements) {
 
     return `
       <article class="stone-card ${element}">
-        <a class="stone-photo-link" href="${escapeHtml(recommendation.pinterestUrl)}" target="_blank" rel="noopener noreferrer">
-          <img class="stone-photo" src="${escapeHtml(recommendation.image)}" alt="${escapeHtml(recommendation.title)} 이미지">
-          <span>Pinterest 참고 이미지 보기</span>
-        </a>
+        <img class="stone-photo" src="${escapeHtml(recommendation.image)}" alt="${escapeHtml(recommendation.title)} 이미지">
         <div class="stone-card-head">
           <span class="stone-symbol">${elementInfo[element].hanja}</span>
           <div>
