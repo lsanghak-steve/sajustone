@@ -106,7 +106,6 @@ h1 {
   line-height: 1.7;
 }
 
-
 .intro-actions {
   display: flex;
   flex-wrap: wrap;
@@ -167,7 +166,6 @@ h1 {
   padding: 12px;
   background: #f2ede4;
 }
-
 
 .stone-buy-link {
   display: block;
@@ -449,7 +447,6 @@ h1 {
   font-weight: 700;
 }
 
-
 .pillar-meta {
   min-height: 28px;
   color: var(--muted);
@@ -550,7 +547,6 @@ h1 {
   text-align: right;
 }
 
-
 .calendar-section {
   margin-top: 26px;
   border: 1px solid var(--line);
@@ -615,9 +611,6 @@ h1 {
   line-height: 1.7;
 }
 
-
-
-
 .stone-section {
   margin-top: 26px;
   border: 1px solid var(--line);
@@ -637,7 +630,6 @@ h1 {
   background: #fffdf8;
   padding: 18px;
 }
-
 
 .stone-photo {
   display: block;
@@ -885,7 +877,6 @@ h1 {
   line-height: 1.7;
 }
 
-
 .solar-correction-card {
   display: grid;
   grid-template-columns: minmax(120px, 0.75fr) minmax(0, 2.25fr);
@@ -937,6 +928,131 @@ h1 {
   font-size: 13px;
   line-height: 1.55;
   word-break: keep-all;
+}
+
+.structure-grid,
+.symbolic-star-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.symbolic-star-grid.single {
+  grid-template-columns: 1fr;
+}
+
+.structure-card,
+.symbolic-star-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 14px;
+}
+
+.structure-card-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.structure-card-head span,
+.symbolic-star-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.structure-card-head strong,
+.symbolic-star-card strong {
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.structure-card-head em {
+  border-radius: 999px;
+  background: #edf4e9;
+  color: var(--wood);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.hidden-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.hidden-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #e4d7c2;
+  border-radius: 999px;
+  background: #fff8ec;
+  color: #5c5144;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hidden-chip b {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.hidden-chip.muted {
+  color: var(--muted);
+}
+
+.symbolic-star-card {
+  display: grid;
+  gap: 12px;
+}
+
+.symbolic-star-card > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.symbolic-star-card dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.symbolic-star-card dl div {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.symbolic-star-card dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.symbolic-star-card dd {
+  margin: 0;
+  color: #4f5a45;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.symbolic-star-card p {
+  margin: 0;
+  color: #5f594f;
+  font-size: 13px;
+  line-height: 1.65;
 }
 .report-overview {
   display: grid;
@@ -1082,7 +1198,6 @@ h1 {
     justify-self: center;
   }
 
-
   .solar-correction-card {
     grid-template-columns: 1fr;
   }
@@ -1095,6 +1210,20 @@ h1 {
 
   .solar-correction-card dl div {
     grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .structure-grid,
+  .symbolic-star-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .structure-card-head {
+    grid-template-columns: 1fr;
+  }
+
+  .symbolic-star-card > div:first-child {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .stones-gallery,
   .stone-list,
@@ -1115,8 +1244,6 @@ h1 {
   .actions {
     grid-template-columns: 1fr;
   }
-
-
   .stones-gallery,
   .stone-list,
   .report-overview,

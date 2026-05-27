@@ -720,6 +720,38 @@ const triadGroups = [
   { name: "화국", branches: [2, 6, 10] },
   { name: "금국", branches: [5, 9, 1] },
 ];
+const symbolicStarDescriptions = {
+  도화: { type: "관계/표현", desc: "매력, 관계성, 표현력이 드러나는 자리입니다. 사람을 끌어들이는 힘으로 쓰되 감정 소모를 조절하는 것이 좋습니다." },
+  역마: { type: "이동/변화", desc: "이동, 확장, 변화에 반응하는 자리입니다. 환경을 바꾸거나 새로운 시장을 탐색할 때 힘이 납니다." },
+  화개: { type: "몰입/전문성", desc: "취향, 연구, 예술성, 깊은 몰입을 만들 수 있는 자리입니다. 혼자 쌓는 실력이 강점이 됩니다." },
+  장성: { type: "주도/책임", desc: "주도권과 책임감이 살아나는 자리입니다. 앞에서 정리하고 이끄는 역할에 힘이 실립니다." },
+  천을귀인: { type: "조력/완충", desc: "도움, 보호, 문제 완충의 상징으로 봅니다. 사람과 제도적 지원을 잘 활용하면 좋습니다." },
+  문창: { type: "학습/기획", desc: "학습, 문서, 기획, 말과 글의 정리에 유리한 자리입니다. 지식을 구조화할수록 빛이 납니다." },
+  양인: { type: "결단/추진", desc: "강한 결단력과 돌파력을 뜻합니다. 속도와 힘은 장점이지만 과격한 판단은 조절이 필요합니다." },
+  괴강: { type: "집중/독립", desc: "주관, 집중력, 독립성이 강하게 잡히는 조합입니다. 기준을 세우면 큰 추진력이 됩니다." },
+  공망: { type: "비움/재정비", desc: "채워지지 않은 빈자리처럼 느껴질 수 있는 지점입니다. 집착보다 재정비와 유연한 운영이 도움이 됩니다." },
+};
+const branchGroupStarTargets = {
+  도화: { water: 9, fire: 3, metal: 6, wood: 0 },
+  역마: { water: 2, fire: 8, metal: 11, wood: 5 },
+  화개: { water: 4, fire: 10, metal: 1, wood: 7 },
+  장성: { water: 0, fire: 6, metal: 9, wood: 3 },
+};
+const noblemanBranchesByStem = {
+  0: [1, 7], 4: [1, 7], 6: [1, 7],
+  1: [0, 8], 5: [0, 8],
+  2: [11, 9], 3: [11, 9],
+  8: [3, 5], 9: [3, 5],
+  7: [6, 2],
+};
+const literatureStarByStem = { 0: 5, 1: 6, 2: 8, 4: 8, 3: 9, 5: 9, 6: 11, 7: 0, 8: 2, 9: 3 };
+const bladeStarByStem = { 0: 3, 1: 2, 2: 6, 4: 6, 3: 5, 5: 5, 6: 9, 7: 8, 8: 0, 9: 11 };
+const strongPillarStars = [
+  { stemIndex: 6, branchIndex: 4 },
+  { stemIndex: 6, branchIndex: 10 },
+  { stemIndex: 8, branchIndex: 4 },
+  { stemIndex: 4, branchIndex: 10 },
+];
 
 function generateAdvancedReportData(pillars, scores, input) {
   const dayStemIndex = pillars[2].stemIndex;
@@ -735,6 +767,7 @@ function generateAdvancedReportData(pillars, scores, input) {
     monthlyLuck: buildMonthlyLuck(dayStemIndex, input.year),
     relations: buildRelationSummary(pillars),
     sals: buildSalSummary(pillars),
+    symbolicStars: buildSymbolicStarSummary(pillars),
     direction: forward ? "순행" : "역행",
     luckStart,
     solarCorrection,
@@ -775,16 +808,19 @@ function getDisplayPillars(pillars) {
 function buildDeepRows(pillars, dayStemIndex) {
   return getDisplayPillars(pillars).map(({ label, pillar }) => {
     if (pillar.empty) {
-      return { label, ganji: "-", tenGod: "-", mainHiddenTenGod: "-", hiddenTenGods: "-", hiddenStems: "-", lifeStage: "-", branchSal: "-", specialSals: "출생시간 확인 필요" };
+      return { label, ganji: "-", tenGod: "-", mainHiddenTenGod: "-", hiddenTenGods: "-", hiddenStems: "-", hiddenStemDetail: "-", hiddenStemItems: [], lifeStage: "-", branchSal: "-", specialSals: "출생시간 확인 필요" };
     }
     const hidden = hiddenStemMap[pillar.branchIndex] || [];
+    const hiddenStemItems = hidden.map((stemIndex) => ({ stem: stems[stemIndex].hanja, tenGod: getTenGod(dayStemIndex, stemIndex) }));
     return {
       label,
       ganji: getPillarHanja(pillar),
       tenGod: getTenGod(dayStemIndex, pillar.stemIndex),
       mainHiddenTenGod: hidden[0] !== undefined ? getTenGod(dayStemIndex, hidden[0]) : "-",
-      hiddenTenGods: hidden.map((stemIndex) => getTenGod(dayStemIndex, stemIndex)).join(", "),
-      hiddenStems: hidden.map((stemIndex) => stems[stemIndex].hanja).join(""),
+      hiddenTenGods: hiddenStemItems.map((item) => item.tenGod).join(", "),
+      hiddenStems: hiddenStemItems.map((item) => item.stem).join(""),
+      hiddenStemDetail: hiddenStemItems.map((item) => `${item.stem}(${item.tenGod})`).join(", "),
+      hiddenStemItems,
       lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
       branchSal: getTwelveSal(pillars[0].branchIndex, pillar.branchIndex),
       specialSals: getSpecialSals(pillars, pillar).join(", ") || "-",
@@ -951,12 +987,111 @@ function buildRelationSummary(pillars) {
 }
 
 function buildSalSummary(pillars) {
+  const symbolicStars = buildSymbolicStarSummary(pillars);
   return getDisplayPillars(pillars).map(({ label, pillar }) => {
-    if (pillar.empty) return { label, branchSal: "-", ganSal: "-", special: "출생시간 확인 필요", all: "-" };
+    if (pillar.empty) return { label, branchSal: "-", ganSal: "-", symbolic: "출생시간 확인 필요", special: "출생시간 확인 필요", all: "-" };
     const branchSal = getTwelveSal(pillars[0].branchIndex, pillar.branchIndex);
+    const symbolic = symbolicStars
+      .filter((star) => star.positions.includes(label))
+      .map((star) => star.name)
+      .join(", ") || "-";
     const special = getSpecialSals(pillars, pillar).join(", ") || "-";
-    return { label, branchSal, ganSal: "-", special, all: [branchSal, special].filter((value) => value && value !== "-").join(", ") || "-" };
+    return { label, branchSal, ganSal: "-", symbolic, special, all: [branchSal, symbolic, special].filter((value) => value && value !== "-").join(", ") || "-" };
   });
+}
+
+function buildSymbolicStarSummary(pillars) {
+  const known = getDisplayPillars(pillars).filter(({ pillar }) => !pillar.empty);
+  const dayPillar = pillars[2];
+  const yearPillar = pillars[0];
+  const collected = [];
+
+  [
+    { label: "년지", branchIndex: yearPillar.branchIndex },
+    { label: "일지", branchIndex: dayPillar.branchIndex },
+  ].forEach((basis) => {
+    const group = getBranchGroup(basis.branchIndex);
+    Object.entries(branchGroupStarTargets).forEach(([name, targets]) => {
+      addSymbolicStar(collected, known, name, `${basis.label} ${branches[basis.branchIndex].hanja} 기준`, [targets[group]]);
+    });
+  });
+
+  addSymbolicStar(collected, known, "천을귀인", `일간 ${stems[dayPillar.stemIndex].hanja} 기준`, noblemanBranchesByStem[dayPillar.stemIndex] || []);
+  addSymbolicStar(collected, known, "문창", `일간 ${stems[dayPillar.stemIndex].hanja} 기준`, [literatureStarByStem[dayPillar.stemIndex]]);
+  addSymbolicStar(collected, known, "양인", `일간 ${stems[dayPillar.stemIndex].hanja} 기준`, [bladeStarByStem[dayPillar.stemIndex]]);
+  addStrongPillarStar(collected, known);
+  addEmptyBranchStar(collected, known, dayPillar);
+
+  return mergeSymbolicStars(collected).slice(0, 8);
+}
+
+function addSymbolicStar(collected, known, name, basis, targetBranches) {
+  const normalizedTargets = targetBranches.filter((branchIndex) => branchIndex !== undefined);
+  if (!normalizedTargets.length) return;
+  const positions = known
+    .filter(({ pillar }) => normalizedTargets.includes(pillar.branchIndex))
+    .map(({ label }) => label);
+  if (!positions.length) return;
+  const meta = symbolicStarDescriptions[name];
+  collected.push({
+    name,
+    type: meta.type,
+    basis,
+    positions,
+    target: normalizedTargets.map((branchIndex) => `${branches[branchIndex].hanja}${branches[branchIndex].ko}`).join(", "),
+    desc: meta.desc,
+  });
+}
+
+function addStrongPillarStar(collected, known) {
+  const positions = known
+    .filter(({ pillar }) => strongPillarStars.some((rule) => rule.stemIndex === pillar.stemIndex && rule.branchIndex === pillar.branchIndex))
+    .map(({ label }) => label);
+  if (!positions.length) return;
+  const meta = symbolicStarDescriptions.괴강;
+  collected.push({ name: "괴강", type: meta.type, basis: "간지 조합 기준", positions, target: "庚辰, 庚戌, 壬辰, 戊戌", desc: meta.desc });
+}
+
+function addEmptyBranchStar(collected, known, dayPillar) {
+  const emptyBranches = getEmptyBranches(dayPillar);
+  const positions = known
+    .filter(({ pillar }) => emptyBranches.includes(pillar.branchIndex))
+    .map(({ label }) => label);
+  if (!positions.length) return;
+  const meta = symbolicStarDescriptions.공망;
+  collected.push({
+    name: "공망",
+    type: meta.type,
+    basis: `일주 ${getPillarHanja(dayPillar)} 순공 기준`,
+    positions,
+    target: emptyBranches.map((branchIndex) => `${branches[branchIndex].hanja}${branches[branchIndex].ko}`).join(", "),
+    desc: meta.desc,
+  });
+}
+
+function mergeSymbolicStars(stars) {
+  const map = new Map();
+  stars.forEach((star) => {
+    const key = `${star.name}:${star.positions.join("/")}:${star.target}`;
+    if (!map.has(key)) {
+      map.set(key, { ...star, basisList: [star.basis] });
+    } else {
+      map.get(key).basisList.push(star.basis);
+    }
+  });
+  return Array.from(map.values()).map((star) => ({ ...star, basis: [...new Set(star.basisList)].join(" · ") }));
+}
+
+function getBranchGroup(branchIndex) {
+  if ([8, 0, 4].includes(branchIndex)) return "water";
+  if ([2, 6, 10].includes(branchIndex)) return "fire";
+  if ([5, 9, 1].includes(branchIndex)) return "metal";
+  return "wood";
+}
+
+function getEmptyBranches(dayPillar) {
+  const branchAtJia = positiveMod(dayPillar.branchIndex - dayPillar.stemIndex, 12);
+  return [positiveMod(branchAtJia - 2, 12), positiveMod(branchAtJia - 1, 12)];
 }
 
 function getTenGod(dayStemIndex, targetStemIndex) {
@@ -1010,6 +1145,7 @@ function renderAdvancedReport(result, input) {
     ["정기지지십성", ...data.deepRows.map((row) => row.mainHiddenTenGod)],
     ["지지십성", ...data.deepRows.map((row) => row.hiddenTenGods)],
     ["지장간", ...data.deepRows.map((row) => row.hiddenStems)],
+    ["지장간 상세", ...data.deepRows.map((row) => row.hiddenStemDetail)],
     ["봉법12운성", ...data.deepRows.map((row) => row.lifeStage)],
     ["지지 신살", ...data.deepRows.map((row) => row.branchSal)],
     ["특수 신살", ...data.deepRows.map((row) => row.specialSals)],
@@ -1021,6 +1157,7 @@ function renderAdvancedReport(result, input) {
   const salRows = [
     ["지지 신살", ...data.sals.map((row) => row.branchSal)],
     ["천간 신살", ...data.sals.map((row) => row.ganSal)],
+    ["주요 신살", ...data.sals.map((row) => row.symbolic)],
     ["특수 신살", ...data.sals.map((row) => row.special)],
     ["종합 신살", ...data.sals.map((row) => row.all)],
   ];
@@ -1029,12 +1166,14 @@ function renderAdvancedReport(result, input) {
   const dayPillarName = getPillarHanja(result.pillars[2]);
   const hourPillarName = result.pillars[3].empty ? "시간 미입력" : getPillarHanja(result.pillars[3]);
   const currentYearLuck = data.yearlyLuck.find((row) => row.year === new Date().getFullYear()) || data.yearlyLuck[data.yearlyLuck.length - 1];
+  const symbolicStarNames = data.symbolicStars.length ? data.symbolicStars.map((star) => star.name).slice(0, 3).join(", ") : "특이 신살 약함";
   const overviewItems = [
     { label: "일주", value: dayPillarName, detail: "나 자신과 관계 방식" },
     { label: "시주", value: hourPillarName, detail: "내면과 후반 흐름" },
     { label: "강한 오행", value: strongest, detail: "자주 드러나는 기운" },
     { label: "보완 오행", value: deficient, detail: "의식적으로 채울 기운" },
     { label: "절기 보정", value: data.solarCorrection.appliedLabel, detail: `월주 ${data.solarCorrection.monthTermName}` },
+    { label: "주요 신살", value: symbolicStarNames, detail: "위치와 활용 포인트" },
     { label: "대운", value: data.direction, detail: `초운 ${data.luckStart.ageLabel}` },
     { label: "올해 세운", value: currentYearLuck.ganji, detail: `${currentYearLuck.year}년 · ${currentYearLuck.sal}` },
   ];
@@ -1054,6 +1193,55 @@ function renderAdvancedReport(result, input) {
   `;
 }
 
+function renderHiddenStemStructure(rows) {
+  return `
+    <div class="structure-grid">
+      ${rows.map((row) => `
+        <article class="structure-card">
+          <div class="structure-card-head">
+            <span>${escapeHtml(row.label)}</span>
+            <strong>${escapeHtml(row.ganji)}</strong>
+            <em>${escapeHtml(row.tenGod)}</em>
+          </div>
+          <div class="hidden-chip-row">
+            ${row.hiddenStemItems.length ? row.hiddenStemItems.map((item) => `<span class="hidden-chip"><b>${escapeHtml(item.stem)}</b>${escapeHtml(item.tenGod)}</span>`).join("") : `<span class="hidden-chip muted">${escapeHtml(row.hiddenStemDetail)}</span>`}
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderSymbolicStars(stars) {
+  if (!stars.length) {
+    return `
+      <div class="symbolic-star-grid single">
+        <article class="symbolic-star-card">
+          <div><span>주요 신살</span><strong>강하게 드러난 항목 없음</strong></div>
+          <p>현재 원국에서는 우선 적용 신살이 강하게 겹치지 않습니다. 기본 오행과 십성 구조를 중심으로 해석하면 좋습니다.</p>
+        </article>
+      </div>
+    `;
+  }
+  return `
+    <div class="symbolic-star-grid">
+      ${stars.map((star) => `
+        <article class="symbolic-star-card">
+          <div>
+            <span>${escapeHtml(star.type)}</span>
+            <strong>${escapeHtml(star.name)}</strong>
+          </div>
+          <dl>
+            <div><dt>위치</dt><dd>${escapeHtml(star.positions.join(", "))}</dd></div>
+            <div><dt>기준</dt><dd>${escapeHtml(star.basis)}</dd></div>
+            <div><dt>대상</dt><dd>${escapeHtml(star.target)}</dd></div>
+          </dl>
+          <p>${escapeHtml(star.desc)}</p>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
 function renderSolarCorrection(correction) {
   return `
     <div class="solar-correction-card">
@@ -1146,7 +1334,7 @@ function generateDetailedReading(result, input) {
     `가장 중심이 되는 글자는 일주의 천간, 즉 일간입니다. ${name}님의 일간은 ${dayStem.ko}${dayStem.hanja}, ${dayStem.yinYang} ${elementInfo[dayStem.element].label}의 성향으로 표시됩니다. 일간은 사주에서 나 자신을 상징하므로 성격을 볼 때 가장 먼저 살피는 기준입니다. 일지는 ${dayBranch.ko}${dayBranch.hanja}로, 일간이 실제 관계와 생활 속에서 어떤 환경을 만나는지 보여줍니다. 다만 일간 하나만으로 성격을 단정하면 해석이 얕아지므로 주변 기둥들이 일간을 돕는지, 소모시키는지, 균형을 잡아주는지를 함께 봐야 합니다.`,
     `이번 결과의 오행 점수는 총 ${totalScore}점 기준으로 ${scoreSummary}입니다. 점수가 높은 오행은 사주 안에서 자주 드러나는 기운이며, 낮은 오행은 의식적으로 보완하면 균형감을 얻기 쉬운 기운입니다. 현재 가장 강하게 나타나는 기운은 ${strongestLabels}이고, 상대적으로 부족하게 잡힌 기운은 ${weakestLabels}입니다. 강한 기운은 장점으로 쓰이면 추진력과 개성이 되지만, 지나치면 고집이나 피로감으로 나타날 수 있습니다. 부족한 기운은 약점이라는 뜻이 아니라 삶에서 더 의식적으로 길러야 할 방향으로 이해하는 것이 좋습니다.`,
     `년주 ${getPillarName(yearPillar)}는 ${elementInfo[stems[yearPillar.stemIndex].element].label}의 천간과 ${elementInfo[branches[yearPillar.branchIndex].element].label}의 지지를 품고 있어 바깥 환경과 첫인상의 색을 만듭니다. 월주 ${getPillarName(monthPillar)}는 계절의 힘을 나타내기 때문에 직업적 태도, 사회성, 성장 방식에 큰 영향을 준다고 봅니다. 같은 일간이라도 월주가 어떤 오행을 가지고 있느냐에 따라 표현 방식이 달라집니다. 그래서 생년월일을 입력해 사주를 볼 때는 단순히 띠만 보는 것보다 월주의 계절감과 일간의 관계를 함께 읽는 것이 훨씬 중요합니다.`,
-    `${timeText} 현재 프로그램은 각 천간과 지지의 대표 오행을 1점씩 더해 분포를 보여주는 간단형 해석입니다. 실제 명리학에서는 지장간, 십성, 합충형해, 대운과 세운, 절기의 정확한 시각까지 함께 보지만, 이 화면에서는 사용자가 자신의 기본 구조를 쉽게 이해하도록 핵심 정보만 먼저 정리합니다. 따라서 결과는 상담용 단정문이 아니라 사주를 처음 이해하기 위한 안내문으로 받아들이는 것이 좋습니다.`,
+    `${timeText} 상세 리포트에는 각 지지 속 지장간과 일간 기준 십성을 함께 표시했습니다. 지장간은 겉으로 바로 보이는 천간보다 생활 속에서 천천히 드러나는 숨은 기운으로 볼 수 있고, 십성은 그 기운이 나에게 친구, 표현, 재성, 관성, 인성 중 어떤 역할로 작동하는지 살피는 기준입니다. 주요 신살은 도화, 역마, 화개, 장성, 천을귀인, 문창, 양인, 괴강, 공망을 우선 적용하되 불안한 단정 대신 위치와 활용 포인트 중심으로 정리했습니다.`,
     `부족 오행으로 표시된 ${weakestLabels}은 지금 사주 구조에서 보완 포인트로 볼 수 있습니다. ${weakMessages} 예를 들어 목이 부족하면 새로운 계획을 세우고 꾸준히 성장시키는 습관이 도움이 되고, 화가 부족하면 표현과 활동성을 키우는 일이 좋습니다. 토가 부족하면 루틴과 안정감을 만들고, 금이 부족하면 정리와 기준 세우기를 연습하며, 수가 부족하면 휴식과 유연한 사고를 의식적으로 챙기는 방식으로 균형을 잡을 수 있습니다.`,
     `이 해석의 목적은 운명을 고정해서 말하는 것이 아니라, 자신에게 익숙한 에너지와 덜 익숙한 에너지를 알아차리게 하는 데 있습니다. 사주는 타고난 기질을 보여주는 언어이고, 실제 삶은 선택, 환경, 관계, 노력에 따라 계속 달라집니다. 그래서 결과 화면은 “좋다” 또는 “나쁘다”보다 “어떤 기운이 강하고 어떤 기운을 보완하면 편안한가”에 초점을 맞추는 것이 좋습니다. 이후 이 기능을 상품 추천과 연결한다면 부족 오행에 맞는 색상, 원석, 염주, 선물 메시지를 자연스럽게 제안할 수 있습니다.`,
   ];
