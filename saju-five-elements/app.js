@@ -864,9 +864,22 @@ function renderAdvancedReport(result, input) {
     ["특수 신살", ...data.sals.map((row) => row.special)],
     ["종합 신살", ...data.sals.map((row) => row.all)],
   ];
-
+  const strongest = getElementsByScore(result.scores, Math.max(...Object.values(result.scores))).map((element) => elementInfo[element].label).join(", ");
+  const deficient = result.deficient.map((element) => elementInfo[element].label).join(", ");
+  const dayPillarName = getPillarHanja(result.pillars[2]);
+  const hourPillarName = result.pillars[3].empty ? "시간 미입력" : getPillarHanja(result.pillars[3]);
+  const currentYearLuck = data.yearlyLuck.find((row) => row.year === new Date().getFullYear()) || data.yearlyLuck[data.yearlyLuck.length - 1];
+  const overviewItems = [
+    { label: "일주", value: dayPillarName, detail: "나 자신과 관계 방식" },
+    { label: "시주", value: hourPillarName, detail: "내면과 후반 흐름" },
+    { label: "강한 오행", value: strongest, detail: "자주 드러나는 기운" },
+    { label: "보완 오행", value: deficient, detail: "의식적으로 채울 기운" },
+    { label: "대운", value: data.direction, detail: `현재 ${data.currentAge}세 기준` },
+    { label: "올해 세운", value: currentYearLuck.ganji, detail: `${currentYearLuck.year}년 · ${currentYearLuck.sal}` },
+  ];
   return `
     <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(getBirthInputLabel(input))}${input.calendarType === "lunar" ? ` · ${escapeHtml(getSolarConversionLabel(input))}` : ""} · ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 현재 ${escapeHtml(data.currentAge)}세</div>
+    ${renderReportOverview(overviewItems)}
     ${renderReportTable("사주 4주", pillarColumns, [pillarValues])}
     ${renderReportTable("오행 분포", elementOrder.map((element) => elementInfo[element].label), [elementValues])}
     ${renderReportTable("심층 분석: 십성 & 12운성", ["구분", ...pillarColumns], deepRows)}
@@ -876,37 +889,31 @@ function renderAdvancedReport(result, input) {
     ${renderReportTable("천간 특수관계", ["유형", "관계쌍", "기둥", "설명"], heavenlyRows)}
     ${renderReportTable("지지 형·충·회·합 해석", ["구분", ...pillarColumns], branchRelationRows)}
     ${renderReportTable("종합 신살", ["구분", ...pillarColumns], salRows)}
-    ${renderReportStones(result.deficient)}
   `;
 }
 
+function renderReportOverview(items) {
+  return `
+    <div class="report-overview">
+      ${items.map((item) => `
+        <div class="report-overview-card">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(item.value)}</strong>
+          <em>${escapeHtml(item.detail)}</em>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
 function renderReportTable(title, columns, rows) {
   return `
     <div class="report-table-block">
-      <h4>${escapeHtml(title)}</h4>
+      <h4><span>${escapeHtml(title)}</span><small>${rows.length}행</small></h4>
       <div class="report-table-wrap">
         <table class="report-table">
           <thead><tr>${columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead>
           <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell ?? "")}</td>`).join("")}</tr>`).join("")}</tbody>
         </table>
-      </div>
-    </div>
-  `;
-}
-
-function renderReportStones(deficientElements) {
-  const stones = deficientElements.flatMap((element) => stoneRecommendations[element].stones.slice(0, 3).map((stone) => ({ ...stone, element })));
-  return `
-    <div class="report-table-block">
-      <h4>부족 오행 추천 원석 사진</h4>
-      <div class="report-stone-grid">
-        ${stones.map((stone) => `
-          <a class="report-stone-card" href="${escapeHtml(stone.purchaseUrl || stoneRecommendations[stone.element].purchaseUrl)}" target="_blank" rel="noopener noreferrer">
-            <img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)} 원석 사진">
-            <strong>${escapeHtml(stone.name)}</strong>
-            <span>${escapeHtml(elementInfo[stone.element].label)}</span>
-          </a>
-        `).join("")}
       </div>
     </div>
   `;

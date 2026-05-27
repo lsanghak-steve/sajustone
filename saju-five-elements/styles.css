@@ -743,7 +743,7 @@ h1 {
   border-left: 3px solid var(--earth);
   background: rgba(188, 138, 44, 0.08);
   color: #5f5033;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-size: 13px;
   line-height: 1.65;
 }
@@ -861,15 +861,67 @@ h1 {
   line-height: 1.7;
 }
 
+.report-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.report-overview-card {
+  display: grid;
+  align-content: start;
+  min-height: 104px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 14px;
+}
+
+.report-overview-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.report-overview-card strong {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.report-overview-card em {
+  margin-top: 8px;
+  color: #6b6358;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.5;
+}
+
 .report-table-block {
-  margin-top: 18px;
+  margin-top: 16px;
 }
 
 .report-table-block h4 {
-  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 8px;
   color: var(--ink);
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.35;
+}
+
+.report-table-block h4 small {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .report-table-wrap {
@@ -881,23 +933,27 @@ h1 {
 
 .report-table {
   width: 100%;
-  min-width: 680px;
-  border-collapse: collapse;
-  font-size: 13px;
-  line-height: 1.55;
+  min-width: 640px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .report-table th,
 .report-table td {
   border-bottom: 1px solid var(--line);
   border-right: 1px solid var(--line);
-  padding: 10px 12px;
+  padding: 8px 10px;
   text-align: center;
   vertical-align: middle;
   white-space: nowrap;
 }
 
 .report-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: #f3eee4;
   color: var(--ink);
   font-weight: 800;
@@ -905,7 +961,20 @@ h1 {
 
 .report-table td:first-child,
 .report-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff8ec;
   font-weight: 800;
+}
+
+.report-table th:first-child {
+  background: #f3eee4;
+  z-index: 3;
+}
+
+.report-table tbody tr:nth-child(even) td:not(:first-child) {
+  background: #fffaf1;
 }
 
 .report-table tr:last-child td {
@@ -915,42 +984,6 @@ h1 {
 .report-table td:last-child,
 .report-table th:last-child {
   border-right: 0;
-}
-
-.report-stone-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.report-stone-card {
-  display: grid;
-  gap: 8px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fffdf8;
-  padding: 12px;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.report-stone-card img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 6px;
-  object-fit: cover;
-  background: #f1eee7;
-}
-
-.report-stone-card strong {
-  font-size: 15px;
-  line-height: 1.3;
-}
-
-.report-stone-card span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
 }
 @media (max-width: 900px) {
   .app-shell {
@@ -974,7 +1007,7 @@ h1 {
 
   .stones-gallery,
   .stone-list,
-  .report-stone-grid,
+  .report-overview,
   .luck-grid,
   .calendar-grid,
   .pillars {
@@ -994,7 +1027,7 @@ h1 {
 
   .stones-gallery,
   .stone-list,
-  .report-stone-grid,
+  .report-overview,
   .luck-grid,
   .calendar-grid,
   .pillars {
