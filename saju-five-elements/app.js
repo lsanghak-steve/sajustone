@@ -68,7 +68,6 @@ const deficientTitle = document.querySelector("#deficient-title");
 const deficientCopy = document.querySelector("#deficient-copy");
 const detailedReadingEl = document.querySelector("#detailed-reading");
 const stoneCardsEl = document.querySelector("#stone-cards");
-const luckCardsEl = document.querySelector("#luck-cards");
 const currentYearTitle = document.querySelector("#current-year-title");
 const currentYearLuckCardsEl = document.querySelector("#current-year-luck-cards");
 const advancedReportEl = document.querySelector("#advanced-report");
@@ -334,7 +333,6 @@ function renderResult(result, input) {
   deficientTitle.innerHTML = chips;
   deficientCopy.textContent = messages;
   stoneCardsEl.innerHTML = renderStoneRecommendations(result.deficient);
-  luckCardsEl.innerHTML = renderLuckCards(generateLuckReadings(result, input));
   const currentYearLuck = generateCurrentYearLuckReadings(result, input);
   currentYearTitle.textContent = `${currentYearLuck.year}년 ${currentYearLuck.pillarName} 올해 운세`;
   currentYearLuckCardsEl.innerHTML = renderLuckCards(currentYearLuck.readings);
