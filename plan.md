@@ -469,3 +469,25 @@
 ## 기대 결과
 
 사용자가 어떤 원석 이미지나 팔찌 이미지를 클릭해도 현재 페이지는 유지되고, 새 탭에서 동일한 스마트스토어 구매 페이지가 열린다.
+
+---
+
+# Vercel 루트 페이지 연결 계획
+
+## 문제 상황
+
+현재 실제 메인 앱은 `saju-five-elements/index.html`에 있고, 저장소 루트에는 `index.html`이 없다. Vercel이 루트 경로(`/`)를 기준으로 배포하면 메인 페이지를 찾지 못해 페이지 없음처럼 보일 수 있다.
+
+## 기능 목표
+
+Vercel에서 루트 주소로 접속해도 사주 앱 메인 화면으로 이동하도록 루트 진입점을 만든다.
+
+## 구현 범위
+
+- 루트 `vercel.json`: `/` 요청을 `/saju-five-elements/`로 리다이렉트
+- 루트 `index.html`: Vercel 설정이 적용되지 않는 환경에서도 앱 폴더로 이동하는 fallback 페이지 추가
+- 기존 `saju-five-elements/` 내부 앱 구조와 자산 경로는 유지
+
+## 기대 결과
+
+Vercel 배포 주소의 루트로 접속해도 `saju-five-elements/index.html` 앱이 열리고, 기존 CSS/JS/assets 상대 경로도 정상 동작한다.

@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/saju-five-elements/",
+      "permanent": false
+    }
+  ]
+}
