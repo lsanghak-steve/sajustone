@@ -13,7 +13,7 @@
           <p class="eyebrow">Five Elements Finder</p>
           <h1>생년월일로 부족한 오행을 확인하세요</h1>
           <p class="lede">
-            양력 생년월일과 출생시간을 기준으로 사주 기둥을 계산하고 목, 화, 토, 금, 수의 분포를 보여주는 간단형 웹 프로그램입니다.
+            양력 또는 음력 생년월일과 출생시간을 기준으로 사주 기둥을 계산하고 목, 화, 토, 금, 수의 분포를 보여주는 웹 프로그램입니다.
           </p>
           <div class="intro-actions">
             <a class="primary-link" href="./stones.html">원석 전체 보기</a>
@@ -47,9 +47,25 @@
             </label>
           </div>
 
+          <div class="segmented" role="radiogroup" aria-label="달력 선택">
+            <label>
+              <input type="radio" name="calendar-type" value="solar" checked>
+              <span>양력</span>
+            </label>
+            <label>
+              <input type="radio" name="calendar-type" value="lunar">
+              <span>음력</span>
+            </label>
+          </div>
+
           <label class="field">
             <span>생년월일</span>
             <input id="birth-date" type="date" required>
+          </label>
+
+          <label class="check-field hidden" id="lunar-leap-row">
+            <input id="lunar-leap" type="checkbox">
+            <span>음력 윤달입니다</span>
           </label>
 
           <label class="field">
@@ -63,7 +79,7 @@
           </label>
 
           <div class="notice">
-            현재 버전은 양력 기준이며, 절기 시각은 표준 날짜 기준으로 계산합니다. 실제 상담용 만세력과 일부 차이가 날 수 있습니다.
+            양력은 음력 정보를 조회하고, 음력은 공식 API로 양력 날짜를 변환해 계산합니다. 절기 시각은 표준 날짜 기준으로 계산하므로 실제 상담용 만세력과 일부 차이가 날 수 있습니다.
           </div>
 
           <div class="actions">

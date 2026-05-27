@@ -55,6 +55,9 @@ const form = document.querySelector("#saju-form");
 const birthDateInput = document.querySelector("#birth-date");
 const birthTimeInput = document.querySelector("#birth-time");
 const unknownTimeInput = document.querySelector("#unknown-time");
+const calendarTypeInputs = Array.from(document.querySelectorAll?.("input[name=calendar-type]") || []);
+const lunarLeapRow = document.querySelector("#lunar-leap-row");
+const lunarLeapInput = document.querySelector("#lunar-leap");
 const sampleButton = document.querySelector("#sample-button");
 const resultTitle = document.querySelector("#result-title");
 const emptyState = document.querySelector("#empty-state");
@@ -77,11 +80,17 @@ unknownTimeInput.addEventListener("change", () => {
   birthTimeInput.disabled = unknownTimeInput.checked;
 });
 
+calendarTypeInputs.forEach((input) => input.addEventListener("change", toggleLunarLeapField));
+toggleLunarLeapField();
+
 sampleButton.addEventListener("click", () => {
   document.querySelector("#name").value = "샘플";
   birthDateInput.value = "1995-08-15";
   birthTimeInput.value = "09:30";
   unknownTimeInput.checked = false;
+  document.querySelector("input[name=calendar-type][value=solar]").checked = true;
+  lunarLeapInput.checked = false;
+  toggleLunarLeapField();
   birthTimeInput.disabled = false;
 });
 
@@ -95,14 +104,20 @@ form.addEventListener("submit", async (event) => {
 
   const dateParts = birthDateInput.value.split("-").map(Number);
   const timeParts = birthTimeInput.value.split(":").map(Number);
+  const calendarType = getSelectedCalendarType();
   const input = {
     name: document.querySelector("#name").value.trim(),
+    enteredYear: dateParts[0],
+    enteredMonth: dateParts[1],
+    enteredDay: dateParts[2],
     year: dateParts[0],
     month: dateParts[1],
     day: dateParts[2],
     hour: unknownTimeInput.checked ? null : timeParts[0],
     minute: unknownTimeInput.checked ? null : timeParts[1],
     gender: document.querySelector("input[name=gender]:checked")?.value || "male",
+    calendarType,
+    isLunarLeap: calendarType === "lunar" && lunarLeapInput.checked,
   };
 
   submitButton.disabled = true;
@@ -110,7 +125,16 @@ form.addEventListener("submit", async (event) => {
   submitButton.textContent = "공식 음양력 조회 중";
 
   try {
-    const lunarInfo = await fetchOfficialLunarInfo(birthDateInput.value);
+    const lunarInfo = await fetchOfficialLunarInfo(birthDateInput.value, input.calendarType, input.isLunarLeap);
+    const calculationDate = getCalculationDate(input, lunarInfo);
+    if (!calculationDate) {
+      window.alert(lunarInfo.message || "음력 날짜를 양력으로 변환하지 못했습니다. 날짜와 윤달 여부를 확인해 주세요.");
+      return;
+    }
+
+    input.year = calculationDate.year;
+    input.month = calculationDate.month;
+    input.day = calculationDate.day;
     renderResult(calculateSaju(input, lunarInfo), input);
   } finally {
     submitButton.disabled = false;
@@ -118,15 +142,21 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-async function fetchOfficialLunarInfo(dateValue) {
+async function fetchOfficialLunarInfo(dateValue, calendarType = "solar", isLunarLeap = false) {
   try {
-    const response = await fetch(`/api/lunar?date=${encodeURIComponent(dateValue)}`);
+    const params = new URLSearchParams({
+      date: dateValue,
+      calendar: calendarType,
+      leap: isLunarLeap ? "true" : "false",
+    });
+    const response = await fetch(`/api/lunar?${params.toString()}`);
     const data = await response.json().catch(() => null);
 
     if (!response.ok || !data?.ok) {
       return {
         ok: false,
-        message: data?.message || "공식 음양력 정보를 불러오지 못했습니다.",
+        calendar: calendarType,
+        message: data?.message || (calendarType === "lunar" ? "공식 음력 변환 정보를 불러오지 못했습니다." : "공식 음양력 정보를 불러오지 못했습니다."),
       };
     }
 
@@ -134,11 +164,50 @@ async function fetchOfficialLunarInfo(dateValue) {
   } catch {
     return {
       ok: false,
-      message: "공식 음양력 API에 연결할 수 없어 기존 계산값으로 표시합니다.",
+      calendar: calendarType,
+      message: calendarType === "lunar" ? "공식 음력 변환 API에 연결할 수 없습니다." : "공식 음양력 API에 연결할 수 없어 기존 계산값으로 표시합니다.",
     };
   }
 }
 
+function getSelectedCalendarType() {
+  return document.querySelector("input[name=calendar-type]:checked")?.value || "solar";
+}
+
+function toggleLunarLeapField() {
+  const isLunar = getSelectedCalendarType() === "lunar";
+  if (isLunar) {
+    lunarLeapRow.classList.remove("hidden");
+  } else {
+    lunarLeapRow.classList.add("hidden");
+    lunarLeapInput.checked = false;
+  }
+}
+
+function getCalculationDate(input, lunarInfo) {
+  if (input.calendarType !== "lunar") {
+    return { year: input.year, month: input.month, day: input.day };
+  }
+
+  if (!lunarInfo?.ok || !lunarInfo.item?.solYear || !lunarInfo.item?.solMonth || !lunarInfo.item?.solDay) {
+    return null;
+  }
+
+  return {
+    year: Number(lunarInfo.item.solYear),
+    month: Number(lunarInfo.item.solMonth),
+    day: Number(lunarInfo.item.solDay),
+  };
+}
+function getBirthInputLabel(input) {
+  const calendarLabel = input.calendarType === "lunar" ? `음력${input.isLunarLeap ? " 윤달" : " 평달"}` : "양력";
+  return `${calendarLabel} ${input.enteredYear ?? input.year}년 ${input.enteredMonth ?? input.month}월 ${input.enteredDay ?? input.day}일`;
+}
+
+function getSolarConversionLabel(input) {
+  if (input.calendarType !== "lunar") return "";
+  return `양력 변환 ${input.year}년 ${input.month}월 ${input.day}일`;
+}
 function parseGanjiPillar(value) {
   if (!value) return null;
   const korean = value.split("(")[0].trim();
@@ -254,7 +323,7 @@ function renderResult(result, input) {
   resultContent.classList.remove("hidden");
 
   pillarsEl.innerHTML = result.pillars.map(renderPillar).join("");
-  renderCalendarInfo(result);
+  renderCalendarInfo(result, input);
   barsEl.innerHTML = renderBars(result.scores);
 
   const chips = result.deficient
@@ -276,7 +345,7 @@ function renderResult(result, input) {
 }
 
 
-function renderCalendarInfo(result) {
+function renderCalendarInfo(result, input) {
   const info = result.lunarInfo;
 
   if (!info?.ok || !info.item) {
@@ -294,9 +363,11 @@ function renderCalendarInfo(result) {
   const lunarDate = `${item.lunYear}년 ${Number(item.lunMonth)}월 ${Number(item.lunDay)}일`;
   const leapText = `${item.lunLeapmonth || "-"} · 음력 ${item.lunNday || "-"}일 달`;
   const solarText = `${item.solYear}-${item.solMonth}-${item.solDay} (${item.solWeek || "-"})`;
+  const inputCalendarText = input.calendarType === "lunar" ? `음력 ${input.isLunarLeap ? "윤달" : "평달"}` : "양력";
   const officialText = result.usesOfficialDayPillar ? "공식 일진을 일주에 반영" : "공식 일진 표시만 반영";
 
   calendarGridEl.innerHTML = [
+    { label: "입력 달력", value: inputCalendarText },
     { label: "양력 기준", value: solarText },
     { label: "음력 날짜", value: lunarDate },
     { label: "평달/윤달", value: leapText },
@@ -313,7 +384,9 @@ function renderCalendarInfo(result) {
     </div>
   `).join("");
 
-  calendarNoteEl.textContent = "한국천문연구원 음양력 정보제공 서비스 응답을 기준으로 음력 정보와 일진을 확인했습니다. 월주는 절기 기준 간단 계산을 유지합니다.";
+  calendarNoteEl.textContent = input.calendarType === "lunar"
+    ? "입력한 음력 날짜를 한국천문연구원 음양력 정보제공 서비스로 양력 변환한 뒤 사주 계산에 반영했습니다."
+    : "입력한 양력 날짜의 공식 음력 정보와 일진을 한국천문연구원 음양력 정보제공 서비스 기준으로 확인했습니다.";
 }
 const stoneRecommendations = {
   wood: {
@@ -795,7 +868,7 @@ function renderAdvancedReport(result, input) {
   ];
 
   return `
-    <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(input.year)}년 ${escapeHtml(input.month)}월 ${escapeHtml(input.day)}일 ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 현재 ${escapeHtml(data.currentAge)}세</div>
+    <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(getBirthInputLabel(input))}${input.calendarType === "lunar" ? ` · ${escapeHtml(getSolarConversionLabel(input))}` : ""} · ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 현재 ${escapeHtml(data.currentAge)}세</div>
     ${renderReportTable("사주 4주", pillarColumns, [pillarValues])}
     ${renderReportTable("오행 분포", elementOrder.map((element) => elementInfo[element].label), [elementValues])}
     ${renderReportTable("심층 분석: 십성 & 12운성", ["구분", ...pillarColumns], deepRows)}
@@ -886,7 +959,7 @@ function generateDetailedReading(result, input) {
     : `출생시간까지 입력되어 시주 ${getPillarName(hourPillar)}도 함께 반영했습니다. 시주는 겉으로 드러난 성향보다 내면의 욕구, 깊은 습관, 오래 두고 발휘되는 가능성을 보는 데 도움을 줍니다.`;
 
   return [
-    `${name}님의 사주는 입력한 생년월일을 기준으로 ${pillarSummary}의 흐름으로 계산됩니다. ${officialCalendarText} 사주는 태어난 해, 달, 날, 시간을 각각 하나의 기둥으로 세우고, 각 기둥의 천간과 지지를 합쳐 여덟 글자로 사람의 기질과 균형을 살피는 방식입니다. 여기서 년주는 성장 배경과 외부에 보이는 첫인상, 월주는 태어난 계절과 사회적 무대, 일주는 자기 자신과 관계 방식, 시주는 내면의 가능성과 후반 흐름을 보는 기준으로 활용됩니다.`,
+    `${name}님의 사주는 ${getBirthInputLabel(input)}을 기준으로 ${input.calendarType === "lunar" ? `${getSolarConversionLabel(input)}로 변환해 ` : ""}${pillarSummary}의 흐름으로 계산됩니다. ${officialCalendarText} 사주는 태어난 해, 달, 날, 시간을 각각 하나의 기둥으로 세우고, 각 기둥의 천간과 지지를 합쳐 여덟 글자로 사람의 기질과 균형을 살피는 방식입니다. 여기서 년주는 성장 배경과 외부에 보이는 첫인상, 월주는 태어난 계절과 사회적 무대, 일주는 자기 자신과 관계 방식, 시주는 내면의 가능성과 후반 흐름을 보는 기준으로 활용됩니다.`,
     `가장 중심이 되는 글자는 일주의 천간, 즉 일간입니다. ${name}님의 일간은 ${dayStem.ko}${dayStem.hanja}, ${dayStem.yinYang} ${elementInfo[dayStem.element].label}의 성향으로 표시됩니다. 일간은 사주에서 나 자신을 상징하므로 성격을 볼 때 가장 먼저 살피는 기준입니다. 일지는 ${dayBranch.ko}${dayBranch.hanja}로, 일간이 실제 관계와 생활 속에서 어떤 환경을 만나는지 보여줍니다. 다만 일간 하나만으로 성격을 단정하면 해석이 얕아지므로 주변 기둥들이 일간을 돕는지, 소모시키는지, 균형을 잡아주는지를 함께 봐야 합니다.`,
     `이번 결과의 오행 점수는 총 ${totalScore}점 기준으로 ${scoreSummary}입니다. 점수가 높은 오행은 사주 안에서 자주 드러나는 기운이며, 낮은 오행은 의식적으로 보완하면 균형감을 얻기 쉬운 기운입니다. 현재 가장 강하게 나타나는 기운은 ${strongestLabels}이고, 상대적으로 부족하게 잡힌 기운은 ${weakestLabels}입니다. 강한 기운은 장점으로 쓰이면 추진력과 개성이 되지만, 지나치면 고집이나 피로감으로 나타날 수 있습니다. 부족한 기운은 약점이라는 뜻이 아니라 삶에서 더 의식적으로 길러야 할 방향으로 이해하는 것이 좋습니다.`,
     `년주 ${getPillarName(yearPillar)}는 ${elementInfo[stems[yearPillar.stemIndex].element].label}의 천간과 ${elementInfo[branches[yearPillar.branchIndex].element].label}의 지지를 품고 있어 바깥 환경과 첫인상의 색을 만듭니다. 월주 ${getPillarName(monthPillar)}는 계절의 힘을 나타내기 때문에 직업적 태도, 사회성, 성장 방식에 큰 영향을 준다고 봅니다. 같은 일간이라도 월주가 어떤 오행을 가지고 있느냐에 따라 표현 방식이 달라집니다. 그래서 생년월일을 입력해 사주를 볼 때는 단순히 띠만 보는 것보다 월주의 계절감과 일간의 관계를 함께 읽는 것이 훨씬 중요합니다.`,
