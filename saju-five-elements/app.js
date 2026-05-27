@@ -68,6 +68,10 @@ const stoneCardsEl = document.querySelector("#stone-cards");
 const luckCardsEl = document.querySelector("#luck-cards");
 const currentYearTitle = document.querySelector("#current-year-title");
 const currentYearLuckCardsEl = document.querySelector("#current-year-luck-cards");
+const advancedReportEl = document.querySelector("#advanced-report");
+const calendarGridEl = document.querySelector("#calendar-grid");
+const calendarNoteEl = document.querySelector("#calendar-note");
+const submitButton = form.querySelector("button[type=submit]");
 
 unknownTimeInput.addEventListener("change", () => {
   birthTimeInput.disabled = unknownTimeInput.checked;
@@ -81,7 +85,7 @@ sampleButton.addEventListener("click", () => {
   birthTimeInput.disabled = false;
 });
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!birthDateInput.value) {
@@ -98,15 +102,59 @@ form.addEventListener("submit", (event) => {
     day: dateParts[2],
     hour: unknownTimeInput.checked ? null : timeParts[0],
     minute: unknownTimeInput.checked ? null : timeParts[1],
+    gender: document.querySelector("input[name=gender]:checked")?.value || "male",
   };
 
-  renderResult(calculateSaju(input), input);
+  submitButton.disabled = true;
+  const previousButtonText = submitButton.textContent;
+  submitButton.textContent = "공식 음양력 조회 중";
+
+  try {
+    const lunarInfo = await fetchOfficialLunarInfo(birthDateInput.value);
+    renderResult(calculateSaju(input, lunarInfo), input);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = previousButtonText;
+  }
 });
 
-function calculateSaju(input) {
+async function fetchOfficialLunarInfo(dateValue) {
+  try {
+    const response = await fetch(`/api/lunar?date=${encodeURIComponent(dateValue)}`);
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok || !data?.ok) {
+      return {
+        ok: false,
+        message: data?.message || "공식 음양력 정보를 불러오지 못했습니다.",
+      };
+    }
+
+    return data;
+  } catch {
+    return {
+      ok: false,
+      message: "공식 음양력 API에 연결할 수 없어 기존 계산값으로 표시합니다.",
+    };
+  }
+}
+
+function parseGanjiPillar(value) {
+  if (!value) return null;
+  const korean = value.split("(")[0].trim();
+  if (korean.length < 2) return null;
+
+  const stemIndex = stems.findIndex((stem) => stem.ko === korean[0]);
+  const branchIndex = branches.findIndex((branch) => branch.ko === korean[1]);
+
+  if (stemIndex === -1 || branchIndex === -1) return null;
+  return { stemIndex, branchIndex };
+}
+function calculateSaju(input, lunarInfo = null) {
   const yearPillar = getYearPillar(input.year, input.month, input.day);
   const monthPillar = getMonthPillar(input.year, input.month, input.day, yearPillar.stemIndex);
-  const dayPillar = getDayPillar(input.year, input.month, input.day);
+  const officialDayPillar = parseGanjiPillar(lunarInfo?.item?.lunIljin);
+  const dayPillar = officialDayPillar || getDayPillar(input.year, input.month, input.day);
   const hourPillar = input.hour === null ? null : getHourPillar(input.hour, dayPillar.stemIndex);
   const pillars = [
     { label: "년주", ...yearPillar },
@@ -128,10 +176,10 @@ function calculateSaju(input) {
 
   const minScore = Math.min(...Object.values(scores));
   const deficient = elementOrder.filter((element) => scores[element] === minScore);
+  const advanced = generateAdvancedReportData(pillars, scores, input);
 
-  return { pillars, scores, deficient };
+  return { pillars, scores, deficient, lunarInfo, usesOfficialDayPillar: Boolean(officialDayPillar), advanced };
 }
-
 function getYearPillar(year, month, day) {
   const effectiveYear = month < 2 || (month === 2 && day < 4) ? year - 1 : year;
   const index = positiveMod(effectiveYear - 4, 60);
@@ -206,6 +254,7 @@ function renderResult(result, input) {
   resultContent.classList.remove("hidden");
 
   pillarsEl.innerHTML = result.pillars.map(renderPillar).join("");
+  renderCalendarInfo(result);
   barsEl.innerHTML = renderBars(result.scores);
 
   const chips = result.deficient
@@ -220,11 +269,52 @@ function renderResult(result, input) {
   const currentYearLuck = generateCurrentYearLuckReadings(result, input);
   currentYearTitle.textContent = `${currentYearLuck.year}년 ${currentYearLuck.pillarName} 올해 운세`;
   currentYearLuckCardsEl.innerHTML = renderLuckCards(currentYearLuck.readings);
+  advancedReportEl.innerHTML = renderAdvancedReport(result, input);
   detailedReadingEl.innerHTML = generateDetailedReading(result, input)
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join("");
 }
 
+
+function renderCalendarInfo(result) {
+  const info = result.lunarInfo;
+
+  if (!info?.ok || !info.item) {
+    calendarGridEl.innerHTML = `
+      <div class="calendar-item calendar-wide">
+        <span>공식 음양력 API</span>
+        <strong>기존 계산값 사용</strong>
+      </div>
+    `;
+    calendarNoteEl.textContent = info?.message || "공식 음양력 정보를 불러오지 못해 기존 자체 계산으로 결과를 표시했습니다.";
+    return;
+  }
+
+  const item = info.item;
+  const lunarDate = `${item.lunYear}년 ${Number(item.lunMonth)}월 ${Number(item.lunDay)}일`;
+  const leapText = `${item.lunLeapmonth || "-"} · 음력 ${item.lunNday || "-"}일 달`;
+  const solarText = `${item.solYear}-${item.solMonth}-${item.solDay} (${item.solWeek || "-"})`;
+  const officialText = result.usesOfficialDayPillar ? "공식 일진을 일주에 반영" : "공식 일진 표시만 반영";
+
+  calendarGridEl.innerHTML = [
+    { label: "양력 기준", value: solarText },
+    { label: "음력 날짜", value: lunarDate },
+    { label: "평달/윤달", value: leapText },
+    { label: "양력 윤년", value: item.solLeapyear || "-" },
+    { label: "세차", value: item.lunSecha || "-" },
+    { label: "월건", value: item.lunWolgeon || "-" },
+    { label: "일진", value: item.lunIljin || "-" },
+    { label: "율리우스 적일", value: item.solJd || "-" },
+    { label: "계산 보정", value: officialText },
+  ].map((entry) => `
+    <div class="calendar-item">
+      <span>${escapeHtml(entry.label)}</span>
+      <strong>${escapeHtml(entry.value)}</strong>
+    </div>
+  `).join("");
+
+  calendarNoteEl.textContent = "한국천문연구원 음양력 정보제공 서비스 응답을 기준으로 음력 정보와 일진을 확인했습니다. 월주는 절기 기준 간단 계산을 유지합니다.";
+}
 const stoneRecommendations = {
   wood: {
     image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF",
@@ -439,6 +529,338 @@ function generateCurrentYearLuckReadings(result, input) {
     ],
   };
 }
+const hiddenStemMap = {
+  0: [9],
+  1: [5, 9, 7],
+  2: [0, 2, 4],
+  3: [1],
+  4: [4, 1, 9],
+  5: [2, 4, 6],
+  6: [3, 5],
+  7: [5, 3, 1],
+  8: [6, 8, 4],
+  9: [7],
+  10: [4, 7, 3],
+  11: [8, 0],
+};
+
+const lifeStageTable = [
+  ["목욕", "관대", "건록", "제왕", "쇠", "병", "사", "묘", "절", "태", "양", "장생"],
+  ["병", "쇠", "제왕", "건록", "관대", "목욕", "장생", "양", "태", "절", "묘", "사"],
+  ["태", "양", "장생", "목욕", "관대", "건록", "제왕", "쇠", "병", "사", "묘", "절"],
+  ["절", "묘", "사", "병", "쇠", "제왕", "건록", "관대", "목욕", "장생", "양", "태"],
+  ["태", "양", "장생", "목욕", "관대", "건록", "제왕", "쇠", "병", "사", "묘", "절"],
+  ["절", "묘", "사", "병", "쇠", "제왕", "건록", "관대", "목욕", "장생", "양", "태"],
+  ["사", "묘", "절", "태", "양", "장생", "목욕", "관대", "건록", "제왕", "쇠", "병"],
+  ["장생", "양", "태", "절", "묘", "사", "병", "쇠", "제왕", "건록", "관대", "목욕"],
+  ["제왕", "쇠", "병", "사", "묘", "절", "태", "양", "장생", "목욕", "관대", "건록"],
+  ["건록", "관대", "목욕", "장생", "양", "태", "절", "묘", "사", "병", "쇠", "제왕"],
+];
+
+const solarTerms = ["소한", "입춘", "경칩", "청명", "입하", "망종", "소서", "입추", "백로", "한로", "입동", "대설"];
+const twelveSalNames = ["겁살", "재살", "천살", "지살", "년살", "월살", "망신살", "장성살", "반안살", "역마살", "육해살", "화개살"];
+const branchRelationRules = {
+  육합: [[0, 1], [2, 11], [3, 10], [4, 9], [5, 8], [6, 7]],
+  충: [[0, 6], [1, 7], [2, 8], [3, 9], [4, 10], [5, 11]],
+  형: [[0, 3], [1, 10], [2, 5], [5, 8], [7, 10]],
+  파: [[0, 9], [1, 4], [2, 11], [3, 6], [5, 8], [7, 10]],
+  해: [[0, 7], [1, 6], [2, 5], [3, 4], [8, 11], [9, 10]],
+  원진: [[0, 7], [1, 6], [2, 9], [3, 8], [4, 11], [5, 10]],
+  귀문: [[0, 9], [1, 6], [2, 7], [3, 8], [4, 11], [5, 10]],
+};
+const heavenlyCombos = [[0, 5], [1, 6], [2, 7], [3, 8], [4, 9]];
+const triadGroups = [
+  { name: "수국", branches: [8, 0, 4] },
+  { name: "목국", branches: [11, 3, 7] },
+  { name: "화국", branches: [2, 6, 10] },
+  { name: "금국", branches: [5, 9, 1] },
+];
+
+function generateAdvancedReportData(pillars, scores, input) {
+  const dayStemIndex = pillars[2].stemIndex;
+  const yearStem = stems[pillars[0].stemIndex];
+  const forward = (input.gender === "male" && yearStem.yinYang === "양") || (input.gender === "female" && yearStem.yinYang === "음");
+  return {
+    displayPillars: getDisplayPillars(pillars),
+    deepRows: buildDeepRows(pillars, dayStemIndex),
+    greatLuck: buildGreatLuck(pillars[1], pillars[0].branchIndex, dayStemIndex, input, forward),
+    yearlyLuck: buildYearlyLuck(pillars[0].branchIndex, dayStemIndex),
+    monthlyLuck: buildMonthlyLuck(dayStemIndex, input.year),
+    relations: buildRelationSummary(pillars),
+    sals: buildSalSummary(pillars),
+    direction: forward ? "순행" : "역행",
+    currentAge: new Date().getFullYear() - input.year + 1,
+    scores,
+  };
+}
+
+function getDisplayPillars(pillars) {
+  return [
+    { key: "hour", label: "시주", pillar: pillars[3] },
+    { key: "day", label: "일주", pillar: pillars[2] },
+    { key: "month", label: "월주", pillar: pillars[1] },
+    { key: "year", label: "연주", pillar: pillars[0] },
+  ];
+}
+
+function buildDeepRows(pillars, dayStemIndex) {
+  return getDisplayPillars(pillars).map(({ label, pillar }) => {
+    if (pillar.empty) {
+      return { label, ganji: "-", tenGod: "-", mainHiddenTenGod: "-", hiddenTenGods: "-", hiddenStems: "-", lifeStage: "-", branchSal: "-", specialSals: "출생시간 확인 필요" };
+    }
+    const hidden = hiddenStemMap[pillar.branchIndex] || [];
+    return {
+      label,
+      ganji: getPillarHanja(pillar),
+      tenGod: getTenGod(dayStemIndex, pillar.stemIndex),
+      mainHiddenTenGod: hidden[0] !== undefined ? getTenGod(dayStemIndex, hidden[0]) : "-",
+      hiddenTenGods: hidden.map((stemIndex) => getTenGod(dayStemIndex, stemIndex)).join(", "),
+      hiddenStems: hidden.map((stemIndex) => stems[stemIndex].hanja).join(""),
+      lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
+      branchSal: getTwelveSal(pillars[0].branchIndex, pillar.branchIndex),
+      specialSals: getSpecialSals(pillars, pillar).join(", ") || "-",
+    };
+  });
+}
+
+function buildGreatLuck(monthPillar, yearBranchIndex, dayStemIndex, input, forward) {
+  const monthCycle = getCycleIndex(monthPillar);
+  const startAge = 9;
+  const rows = Array.from({ length: 10 }, (_, index) => {
+    const age = startAge + index * 10;
+    const cycleIndex = positiveMod(monthCycle + (forward ? index + 1 : -(index + 1)), 60);
+    const pillar = cyclePillar(cycleIndex);
+    return {
+      age,
+      range: `${age}세`,
+      ganji: getPillarHanja(pillar),
+      stem: stems[pillar.stemIndex].hanja,
+      branch: branches[pillar.branchIndex].hanja,
+      startYear: input.year + age - 1,
+      direction: forward ? "순행" : "역행",
+      current: new Date().getFullYear() - input.year + 1 >= age && new Date().getFullYear() - input.year + 1 < age + 10 ? "●" : "",
+      sal: getTwelveSal(yearBranchIndex, pillar.branchIndex),
+      lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
+    };
+  });
+  return forward ? rows : rows.reverse();
+}
+
+function buildYearlyLuck(yearBranchIndex, dayStemIndex) {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: 10 }, (_, index) => {
+    const year = currentYear - 9 + index;
+    const pillar = getYearPillar(year, 7, 1);
+    return {
+      year,
+      ganji: getPillarHanja(pillar),
+      stem: stems[pillar.stemIndex].hanja,
+      branch: branches[pillar.branchIndex].hanja,
+      sal: getTwelveSal(yearBranchIndex, pillar.branchIndex),
+      lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
+    };
+  });
+}
+
+function buildMonthlyLuck(dayStemIndex, year) {
+  const yearPillar = getYearPillar(new Date().getFullYear(), 7, 1);
+  return Array.from({ length: 12 }, (_, index) => {
+    const month = 12 - index;
+    const pillar = getMonthPillar(new Date().getFullYear(), month, 15, yearPillar.stemIndex);
+    return {
+      month,
+      name: `${month}월`,
+      ganji: getPillarHanja(pillar),
+      stem: stems[pillar.stemIndex].hanja,
+      branch: branches[pillar.branchIndex].hanja,
+      sal: getTwelveSal(getYearPillar(year, 7, 1).branchIndex, pillar.branchIndex),
+      lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
+      stemTenGod: getTenGod(dayStemIndex, pillar.stemIndex),
+      branchTenGod: getTenGod(dayStemIndex, (hiddenStemMap[pillar.branchIndex] || [pillar.stemIndex])[0]),
+      term: solarTerms[month - 1],
+    };
+  });
+}
+
+function buildRelationSummary(pillars) {
+  const known = getDisplayPillars(pillars).filter(({ pillar }) => !pillar.empty);
+  const stemPairs = [];
+  const branchRows = { 지장간: {}, 방합: {}, 삼합: {}, 반합: {}, 육합: {}, 충: {}, 형: {}, 파: {}, 해: {}, 원진: {}, 귀문: {} };
+
+  known.forEach(({ label, pillar }) => {
+    branchRows.지장간[label] = (hiddenStemMap[pillar.branchIndex] || []).map((stemIndex) => stems[stemIndex].hanja).join("");
+  });
+
+  for (let i = 0; i < known.length; i += 1) {
+    for (let j = i + 1; j < known.length; j += 1) {
+      const first = known[i];
+      const second = known[j];
+      if (matchesPair(heavenlyCombos, first.pillar.stemIndex, second.pillar.stemIndex)) {
+        stemPairs.push({ type: "합", pair: `${stems[first.pillar.stemIndex].hanja}${stems[second.pillar.stemIndex].hanja}`, pillars: `${first.label}-${second.label}`, desc: `${stems[first.pillar.stemIndex].hanja}${stems[second.pillar.stemIndex].hanja}합` });
+      }
+      Object.entries(branchRelationRules).forEach(([type, pairs]) => {
+        if (matchesPair(pairs, first.pillar.branchIndex, second.pillar.branchIndex)) {
+          branchRows[type][first.label] = appendCell(branchRows[type][first.label], `${branches[first.pillar.branchIndex].hanja}${branches[second.pillar.branchIndex].hanja}`);
+          branchRows[type][second.label] = appendCell(branchRows[type][second.label], `${branches[first.pillar.branchIndex].hanja}${branches[second.pillar.branchIndex].hanja}`);
+        }
+      });
+    }
+  }
+
+  triadGroups.forEach((group) => {
+    const matches = known.filter(({ pillar }) => group.branches.includes(pillar.branchIndex));
+    if (matches.length >= 3) {
+      matches.forEach(({ label }) => { branchRows.삼합[label] = appendCell(branchRows.삼합[label], group.name); });
+    } else if (matches.length === 2) {
+      matches.forEach(({ label }) => { branchRows.반합[label] = appendCell(branchRows.반합[label], group.name); });
+    }
+  });
+
+  return { heavenly: stemPairs, branchRows };
+}
+
+function buildSalSummary(pillars) {
+  return getDisplayPillars(pillars).map(({ label, pillar }) => {
+    if (pillar.empty) return { label, branchSal: "-", ganSal: "-", special: "출생시간 확인 필요", all: "-" };
+    const branchSal = getTwelveSal(pillars[0].branchIndex, pillar.branchIndex);
+    const special = getSpecialSals(pillars, pillar).join(", ") || "-";
+    return { label, branchSal, ganSal: "-", special, all: [branchSal, special].filter((value) => value && value !== "-").join(", ") || "-" };
+  });
+}
+
+function getTenGod(dayStemIndex, targetStemIndex) {
+  const dayStem = stems[dayStemIndex];
+  const targetStem = stems[targetStemIndex];
+  const samePolarity = dayStem.yinYang === targetStem.yinYang;
+  if (dayStem.element === targetStem.element) return samePolarity ? "비견" : "겁재";
+  if (creates(dayStem.element, targetStem.element)) return samePolarity ? "식신" : "상관";
+  if (controls(dayStem.element, targetStem.element)) return samePolarity ? "편재" : "정재";
+  if (controls(targetStem.element, dayStem.element)) return samePolarity ? "편관" : "정관";
+  if (creates(targetStem.element, dayStem.element)) return samePolarity ? "편인" : "정인";
+  return "-";
+}
+
+function creates(source, target) {
+  return { wood: "fire", fire: "earth", earth: "metal", metal: "water", water: "wood" }[source] === target;
+}
+
+function controls(source, target) {
+  return { wood: "earth", fire: "metal", earth: "water", metal: "wood", water: "fire" }[source] === target;
+}
+
+function getLifeStage(dayStemIndex, branchIndex) {
+  return lifeStageTable[dayStemIndex][branchIndex] || "-";
+}
+
+function getTwelveSal(yearBranchIndex, branchIndex) {
+  return twelveSalNames[positiveMod(branchIndex - yearBranchIndex, 12)];
+}
+
+function getSpecialSals(pillars, pillar) {
+  const dayPillar = pillars[2];
+  const sals = [];
+  if (stems[pillar.stemIndex].element === branches[pillar.branchIndex].element) sals.push("간여지동");
+  if (matchesPair(branchRelationRules.원진, dayPillar.branchIndex, pillar.branchIndex)) sals.push("원진");
+  if (matchesPair(branchRelationRules.귀문, dayPillar.branchIndex, pillar.branchIndex)) sals.push("귀문");
+  if (matchesPair(branchRelationRules.충, dayPillar.branchIndex, pillar.branchIndex)) sals.push("충");
+  if (["장생", "건록", "제왕"].includes(getLifeStage(dayPillar.stemIndex, pillar.branchIndex))) sals.push("활력성");
+  return [...new Set(sals)];
+}
+
+function renderAdvancedReport(result, input) {
+  const data = result.advanced;
+  const displayPillars = data.displayPillars;
+  const genderText = input.gender === "female" ? "여성" : "남성";
+  const pillarColumns = displayPillars.map((entry) => entry.label);
+  const pillarValues = displayPillars.map(({ pillar }) => pillar.empty ? "-" : getPillarHanja(pillar));
+  const elementValues = elementOrder.map((element) => String(result.scores[element]));
+  const deepRows = [
+    ["십성", ...data.deepRows.map((row) => row.tenGod)],
+    ["정기지지십성", ...data.deepRows.map((row) => row.mainHiddenTenGod)],
+    ["지지십성", ...data.deepRows.map((row) => row.hiddenTenGods)],
+    ["지장간", ...data.deepRows.map((row) => row.hiddenStems)],
+    ["봉법12운성", ...data.deepRows.map((row) => row.lifeStage)],
+    ["지지 신살", ...data.deepRows.map((row) => row.branchSal)],
+    ["특수 신살", ...data.deepRows.map((row) => row.specialSals)],
+  ];
+  const branchRelationRows = Object.entries(data.relations.branchRows).map(([type, cells]) => [type, ...displayPillars.map((entry) => cells[entry.label] || "")]);
+  const heavenlyRows = data.relations.heavenly.length
+    ? data.relations.heavenly.map((row) => [row.type, row.pair, row.pillars, row.desc])
+    : [["-", "-", "-", "천간합이 강하게 드러나지 않습니다."]];
+  const salRows = [
+    ["지지 신살", ...data.sals.map((row) => row.branchSal)],
+    ["천간 신살", ...data.sals.map((row) => row.ganSal)],
+    ["특수 신살", ...data.sals.map((row) => row.special)],
+    ["종합 신살", ...data.sals.map((row) => row.all)],
+  ];
+
+  return `
+    <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(input.year)}년 ${escapeHtml(input.month)}월 ${escapeHtml(input.day)}일 ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 현재 ${escapeHtml(data.currentAge)}세</div>
+    ${renderReportTable("사주 4주", pillarColumns, [pillarValues])}
+    ${renderReportTable("오행 분포", elementOrder.map((element) => elementInfo[element].label), [elementValues])}
+    ${renderReportTable("심층 분석: 십성 & 12운성", ["구분", ...pillarColumns], deepRows)}
+    ${renderReportTable("대운", ["나이범위", "간지", "천간", "지지", "시작연도", "방향", "현재", "신살", "12운성"], data.greatLuck.map((row) => [row.range, row.ganji, row.stem, row.branch, row.startYear, row.direction, row.current, row.sal, row.lifeStage]))}
+    ${renderReportTable("세운", ["연도", "간지", "천간", "지지", "신살", "12운성"], data.yearlyLuck.map((row) => [row.year, row.ganji, row.stem, row.branch, row.sal, row.lifeStage]))}
+    ${renderReportTable("월운", ["월", "월명", "간지", "천간", "지지", "신살", "12운성", "천간십성", "지지십성", "절기"], data.monthlyLuck.map((row) => [row.month, row.name, row.ganji, row.stem, row.branch, row.sal, row.lifeStage, row.stemTenGod, row.branchTenGod, row.term]))}
+    ${renderReportTable("천간 특수관계", ["유형", "관계쌍", "기둥", "설명"], heavenlyRows)}
+    ${renderReportTable("지지 형·충·회·합 해석", ["구분", ...pillarColumns], branchRelationRows)}
+    ${renderReportTable("종합 신살", ["구분", ...pillarColumns], salRows)}
+    ${renderReportStones(result.deficient)}
+  `;
+}
+
+function renderReportTable(title, columns, rows) {
+  return `
+    <div class="report-table-block">
+      <h4>${escapeHtml(title)}</h4>
+      <div class="report-table-wrap">
+        <table class="report-table">
+          <thead><tr>${columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead>
+          <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell ?? "")}</td>`).join("")}</tr>`).join("")}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderReportStones(deficientElements) {
+  const stones = deficientElements.flatMap((element) => stoneRecommendations[element].stones.slice(0, 3).map((stone) => ({ ...stone, element })));
+  return `
+    <div class="report-table-block">
+      <h4>부족 오행 추천 원석 사진</h4>
+      <div class="report-stone-grid">
+        ${stones.map((stone) => `
+          <a class="report-stone-card" href="${escapeHtml(stone.purchaseUrl || stoneRecommendations[stone.element].purchaseUrl)}" target="_blank" rel="noopener noreferrer">
+            <img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)} 원석 사진">
+            <strong>${escapeHtml(stone.name)}</strong>
+            <span>${escapeHtml(elementInfo[stone.element].label)}</span>
+          </a>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function getCycleIndex(pillar) {
+  return Array.from({ length: 60 }, (_, index) => index).find((index) => index % 10 === pillar.stemIndex && index % 12 === pillar.branchIndex) || 0;
+}
+
+function cyclePillar(index) {
+  return { stemIndex: positiveMod(index, 10), branchIndex: positiveMod(index, 12) };
+}
+
+function getPillarHanja(pillar) {
+  if (pillar.empty) return "-";
+  return `${stems[pillar.stemIndex].hanja}${branches[pillar.branchIndex].hanja}`;
+}
+
+function matchesPair(pairs, first, second) {
+  return pairs.some(([left, right]) => (left === first && right === second) || (left === second && right === first));
+}
+
+function appendCell(current, value) {
+  return current ? `${current}, ${value}` : value;
+}
 function generateDetailedReading(result, input) {
   const name = input.name || "사용자";
   const knownPillars = result.pillars.filter((pillar) => !pillar.empty);
@@ -452,6 +874,9 @@ function generateDetailedReading(result, input) {
   const weakest = result.deficient;
   const totalScore = Object.values(result.scores).reduce((sum, score) => sum + score, 0);
   const scoreSummary = elementOrder.map((element) => `${elementInfo[element].label} ${result.scores[element]}점`).join(", ");
+  const officialCalendarText = result.lunarInfo?.ok && result.lunarInfo.item
+    ? `한국천문연구원 공식 음양력 기준으로 음력 ${result.lunarInfo.item.lunYear}년 ${Number(result.lunarInfo.item.lunMonth)}월 ${Number(result.lunarInfo.item.lunDay)}일, ${result.lunarInfo.item.lunLeapmonth}달, 일진 ${result.lunarInfo.item.lunIljin}, 월건 ${result.lunarInfo.item.lunWolgeon}, 세차 ${result.lunarInfo.item.lunSecha} 정보를 확인했습니다. ${result.usesOfficialDayPillar ? "이 중 일진은 일주 계산에 우선 반영했습니다." : "다만 일진 파싱이 되지 않아 기존 자체 일주 계산을 유지했습니다."}`
+    : "공식 음양력 API 정보를 불러오지 못해 기존 자체 계산 방식으로 사주 기둥을 산출했습니다.";
   const pillarSummary = knownPillars.map((pillar) => `${pillar.label} ${getPillarName(pillar)}`).join(", ");
   const strongestLabels = strongest.map((element) => elementInfo[element].label).join(", ");
   const weakestLabels = weakest.map((element) => elementInfo[element].label).join(", ");
@@ -461,7 +886,7 @@ function generateDetailedReading(result, input) {
     : `출생시간까지 입력되어 시주 ${getPillarName(hourPillar)}도 함께 반영했습니다. 시주는 겉으로 드러난 성향보다 내면의 욕구, 깊은 습관, 오래 두고 발휘되는 가능성을 보는 데 도움을 줍니다.`;
 
   return [
-    `${name}님의 사주는 입력한 생년월일을 기준으로 ${pillarSummary}의 흐름으로 계산됩니다. 사주는 태어난 해, 달, 날, 시간을 각각 하나의 기둥으로 세우고, 각 기둥의 천간과 지지를 합쳐 여덟 글자로 사람의 기질과 균형을 살피는 방식입니다. 여기서 년주는 성장 배경과 외부에 보이는 첫인상, 월주는 태어난 계절과 사회적 무대, 일주는 자기 자신과 관계 방식, 시주는 내면의 가능성과 후반 흐름을 보는 기준으로 활용됩니다.`,
+    `${name}님의 사주는 입력한 생년월일을 기준으로 ${pillarSummary}의 흐름으로 계산됩니다. ${officialCalendarText} 사주는 태어난 해, 달, 날, 시간을 각각 하나의 기둥으로 세우고, 각 기둥의 천간과 지지를 합쳐 여덟 글자로 사람의 기질과 균형을 살피는 방식입니다. 여기서 년주는 성장 배경과 외부에 보이는 첫인상, 월주는 태어난 계절과 사회적 무대, 일주는 자기 자신과 관계 방식, 시주는 내면의 가능성과 후반 흐름을 보는 기준으로 활용됩니다.`,
     `가장 중심이 되는 글자는 일주의 천간, 즉 일간입니다. ${name}님의 일간은 ${dayStem.ko}${dayStem.hanja}, ${dayStem.yinYang} ${elementInfo[dayStem.element].label}의 성향으로 표시됩니다. 일간은 사주에서 나 자신을 상징하므로 성격을 볼 때 가장 먼저 살피는 기준입니다. 일지는 ${dayBranch.ko}${dayBranch.hanja}로, 일간이 실제 관계와 생활 속에서 어떤 환경을 만나는지 보여줍니다. 다만 일간 하나만으로 성격을 단정하면 해석이 얕아지므로 주변 기둥들이 일간을 돕는지, 소모시키는지, 균형을 잡아주는지를 함께 봐야 합니다.`,
     `이번 결과의 오행 점수는 총 ${totalScore}점 기준으로 ${scoreSummary}입니다. 점수가 높은 오행은 사주 안에서 자주 드러나는 기운이며, 낮은 오행은 의식적으로 보완하면 균형감을 얻기 쉬운 기운입니다. 현재 가장 강하게 나타나는 기운은 ${strongestLabels}이고, 상대적으로 부족하게 잡힌 기운은 ${weakestLabels}입니다. 강한 기운은 장점으로 쓰이면 추진력과 개성이 되지만, 지나치면 고집이나 피로감으로 나타날 수 있습니다. 부족한 기운은 약점이라는 뜻이 아니라 삶에서 더 의식적으로 길러야 할 방향으로 이해하는 것이 좋습니다.`,
     `년주 ${getPillarName(yearPillar)}는 ${elementInfo[stems[yearPillar.stemIndex].element].label}의 천간과 ${elementInfo[branches[yearPillar.branchIndex].element].label}의 지지를 품고 있어 바깥 환경과 첫인상의 색을 만듭니다. 월주 ${getPillarName(monthPillar)}는 계절의 힘을 나타내기 때문에 직업적 태도, 사회성, 성장 방식에 큰 영향을 준다고 봅니다. 같은 일간이라도 월주가 어떤 오행을 가지고 있느냐에 따라 표현 방식이 달라집니다. 그래서 생년월일을 입력해 사주를 볼 때는 단순히 띠만 보는 것보다 월주의 계절감과 일간의 관계를 함께 읽는 것이 훨씬 중요합니다.`,
@@ -482,7 +907,7 @@ function getPillarName(pillar) {
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")

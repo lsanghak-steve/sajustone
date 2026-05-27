@@ -1,62 +1,21 @@
-﻿import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, extname, join, normalize } from "node:path";
+﻿const DEFAULT_ENDPOINT = "https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService";
 
-const root = normalize(dirname(fileURLToPath(import.meta.url)));
-const workspaceRoot = normalize(join(root, ".."));
-const port = 4174;
-const types = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".md": "text/plain; charset=utf-8",
-};
-
-const env = await loadLocalEnv();
-
-createServer(async (request, response) => {
-  const url = new URL(request.url ?? "/", `http://${request.headers.host}`);
-
-  if (url.pathname === "/api/lunar") {
-    await handleLunarApi(url, response);
-    return;
-  }
-
-  const target = normalize(join(root, url.pathname === "/" ? "index.html" : url.pathname));
-
-  if (!target.startsWith(root + "\\") && target !== root) {
-    response.writeHead(403);
-    response.end("Forbidden");
-    return;
-  }
-
-  try {
-    const file = await readFile(target);
-    response.writeHead(200, { "Content-Type": types[extname(target)] ?? "application/octet-stream" });
-    response.end(file);
-  } catch {
-    response.writeHead(404);
-    response.end("Not found");
-  }
-}).listen(port, "127.0.0.1", () => {
-  console.log(`Saju app running at http://127.0.0.1:${port}/`);
-});
-
-async function handleLunarApi(url, response) {
+module.exports = async function handler(request, response) {
+  const url = new URL(request.url, `http://${request.headers.host || "localhost"}`);
   const date = url.searchParams.get("date") || "";
   const parts = date.split("-").map(Number);
   const solYear = url.searchParams.get("solYear") || String(parts[0] || "");
   const solMonth = url.searchParams.get("solMonth") || pad2(parts[1]);
   const solDay = url.searchParams.get("solDay") || pad2(parts[2]);
 
+  response.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=604800");
+
   if (!/^\d{4}$/.test(solYear) || !/^\d{2}$/.test(solMonth) || !/^\d{2}$/.test(solDay)) {
     sendJson(response, 400, { ok: false, message: "날짜 형식이 올바르지 않습니다." });
     return;
   }
 
-  const rawServiceKey = process.env.KASI_SERVICE_KEY || env.KASI_SERVICE_KEY || env.KASI_SERVICE_KEY_ENCODING || env.KASI_SERVICE_KEY_DECODING;
+  const rawServiceKey = process.env.KASI_SERVICE_KEY || process.env.KASI_SERVICE_KEY_ENCODING || process.env.KASI_SERVICE_KEY_DECODING;
   const serviceKey = normalizeServiceKey(rawServiceKey);
   if (!serviceKey) {
     sendJson(response, 500, { ok: false, message: "KASI_SERVICE_KEY 환경변수가 설정되지 않았습니다." });
@@ -64,7 +23,7 @@ async function handleLunarApi(url, response) {
   }
 
   try {
-    const endpoint = process.env.KASI_LUNAR_API_ENDPOINT || env.KASI_LUNAR_API_ENDPOINT || "https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService";
+    const endpoint = process.env.KASI_LUNAR_API_ENDPOINT || DEFAULT_ENDPOINT;
     const params = new URLSearchParams({ solYear, solMonth, solDay });
     const apiUrl = `${endpoint}/getLunCalInfo?${params.toString()}&ServiceKey=${serviceKey}`;
     const apiResponse = await fetch(apiUrl);
@@ -97,25 +56,10 @@ async function handleLunarApi(url, response) {
         solJd: pick(xml, "solJd"),
       },
     });
-  } catch {
+  } catch (error) {
     sendJson(response, 500, { ok: false, message: "음양력 API 처리 중 오류가 발생했습니다." });
   }
-}
-
-async function loadLocalEnv() {
-  const envPath = join(workspaceRoot, ".env");
-  if (!existsSync(envPath)) return {};
-
-  const content = await readFile(envPath, "utf8");
-  return content.split(/\r?\n/).reduce((acc, line) => {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) return acc;
-    const index = trimmed.indexOf("=");
-    if (index === -1) return acc;
-    acc[trimmed.slice(0, index)] = trimmed.slice(index + 1);
-    return acc;
-  }, {});
-}
+};
 
 function pick(xml, tag) {
   const match = xml.match(new RegExp(`<${tag}>([^<]*)</${tag}>`));
@@ -141,6 +85,7 @@ function pad2(value) {
 }
 
 function sendJson(response, status, data) {
-  response.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  response.statusCode = status;
+  response.setHeader("Content-Type", "application/json; charset=utf-8");
   response.end(JSON.stringify(data));
 }

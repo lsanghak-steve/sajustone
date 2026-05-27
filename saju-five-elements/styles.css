@@ -526,6 +526,50 @@ h1 {
   text-align: right;
 }
 
+
+.calendar-section {
+  margin-top: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 22px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.calendar-item {
+  min-height: 88px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 14px;
+}
+
+.calendar-item span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.calendar-item strong {
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.calendar-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
 .recommendation {
   margin-top: 26px;
   border: 1px solid var(--line);
@@ -799,6 +843,115 @@ h1 {
   font-weight: 800;
 }
 
+.advanced-report {
+  margin-top: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 22px;
+}
+
+.report-note {
+  margin-bottom: 16px;
+  border-left: 3px solid var(--wood);
+  background: #f7fbf4;
+  color: #4f5a45;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.report-table-block {
+  margin-top: 18px;
+}
+
+.report-table-block h4 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.report-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.report-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.report-table th,
+.report-table td {
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.report-table th {
+  background: #f3eee4;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.report-table td:first-child,
+.report-table th:first-child {
+  font-weight: 800;
+}
+
+.report-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-table td:last-child,
+.report-table th:last-child {
+  border-right: 0;
+}
+
+.report-stone-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.report-stone-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 12px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.report-stone-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #f1eee7;
+}
+
+.report-stone-card strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.report-stone-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
 @media (max-width: 900px) {
   .app-shell {
     width: min(100% - 24px, 680px);
@@ -821,7 +974,9 @@ h1 {
 
   .stones-gallery,
   .stone-list,
+  .report-stone-grid,
   .luck-grid,
+  .calendar-grid,
   .pillars {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -839,7 +994,9 @@ h1 {
 
   .stones-gallery,
   .stone-list,
+  .report-stone-grid,
   .luck-grid,
+  .calendar-grid,
   .pillars {
     grid-template-columns: 1fr;
   }
