@@ -36,19 +36,20 @@ const elementInfo = {
 
 const elementOrder = ["wood", "fire", "earth", "metal", "water"];
 
-const monthBoundaries = [
-  { month: 1, day: 6, branch: 1, order: 12 },
-  { month: 2, day: 4, branch: 2, order: 1 },
-  { month: 3, day: 6, branch: 3, order: 2 },
-  { month: 4, day: 5, branch: 4, order: 3 },
-  { month: 5, day: 6, branch: 5, order: 4 },
-  { month: 6, day: 6, branch: 6, order: 5 },
-  { month: 7, day: 7, branch: 7, order: 6 },
-  { month: 8, day: 8, branch: 8, order: 7 },
-  { month: 9, day: 8, branch: 9, order: 8 },
-  { month: 10, day: 8, branch: 10, order: 9 },
-  { month: 11, day: 7, branch: 11, order: 10 },
-  { month: 12, day: 7, branch: 0, order: 11 },
+const solarTermSearchWindowDays = 3;
+const solarTermBoundaries = [
+  { name: "소한", month: 1, fallbackDay: 6, branch: 1, order: 12, targetLongitude: 285 },
+  { name: "입춘", month: 2, fallbackDay: 4, branch: 2, order: 1, targetLongitude: 315 },
+  { name: "경칩", month: 3, fallbackDay: 6, branch: 3, order: 2, targetLongitude: 345 },
+  { name: "청명", month: 4, fallbackDay: 5, branch: 4, order: 3, targetLongitude: 15 },
+  { name: "입하", month: 5, fallbackDay: 6, branch: 5, order: 4, targetLongitude: 45 },
+  { name: "망종", month: 6, fallbackDay: 6, branch: 6, order: 5, targetLongitude: 75 },
+  { name: "소서", month: 7, fallbackDay: 7, branch: 7, order: 6, targetLongitude: 105 },
+  { name: "입추", month: 8, fallbackDay: 8, branch: 8, order: 7, targetLongitude: 135 },
+  { name: "백로", month: 9, fallbackDay: 8, branch: 9, order: 8, targetLongitude: 165 },
+  { name: "한로", month: 10, fallbackDay: 8, branch: 10, order: 9, targetLongitude: 195 },
+  { name: "입동", month: 11, fallbackDay: 7, branch: 11, order: 10, targetLongitude: 225 },
+  { name: "대설", month: 12, fallbackDay: 7, branch: 0, order: 11, targetLongitude: 255 },
 ];
 
 const form = document.querySelector("#saju-form");
@@ -219,8 +220,8 @@ function parseGanjiPillar(value) {
   return { stemIndex, branchIndex };
 }
 function calculateSaju(input, lunarInfo = null) {
-  const yearPillar = getYearPillar(input.year, input.month, input.day);
-  const monthPillar = getMonthPillar(input.year, input.month, input.day, yearPillar.stemIndex);
+  const yearPillar = getYearPillar(input.year, input.month, input.day, input.hour, input.minute);
+  const monthPillar = getMonthPillar(input.year, input.month, input.day, yearPillar.stemIndex, input.hour, input.minute);
   const officialDayPillar = parseGanjiPillar(lunarInfo?.item?.lunIljin);
   const dayPillar = officialDayPillar || getDayPillar(input.year, input.month, input.day);
   const hourPillar = input.hour === null ? null : getHourPillar(input.hour, dayPillar.stemIndex);
@@ -248,35 +249,108 @@ function calculateSaju(input, lunarInfo = null) {
 
   return { pillars, scores, deficient, lunarInfo, usesOfficialDayPillar: Boolean(officialDayPillar), advanced };
 }
-function getYearPillar(year, month, day) {
-  const effectiveYear = month < 2 || (month === 2 && day < 4) ? year - 1 : year;
+function getYearPillar(year, month, day, hour = 12, minute = 0) {
+  const birthDate = new Date(year, month - 1, day, hour ?? 12, minute ?? 0, 0, 0);
+  const ipchun = getSolarTermBoundary(year, solarTermBoundaries[1]);
+  const effectiveYear = birthDate < ipchun.date ? year - 1 : year;
   const index = positiveMod(effectiveYear - 4, 60);
   return {
     stemIndex: index % 10,
     branchIndex: index % 12,
+    effectiveYear,
+    yearCorrection: {
+      termName: ipchun.name,
+      termDateLabel: formatDateTime(ipchun.date),
+      source: ipchun.source,
+      isPrecise: ipchun.isPrecise,
+      applied: effectiveYear !== year,
+    },
   };
 }
 
-function getMonthPillar(year, month, day, yearStemIndex) {
-  const boundary = getMonthBoundary(month, day);
+function getMonthPillar(year, month, day, yearStemIndex, hour = 12, minute = 0) {
+  const boundary = getMonthBoundary(year, month, day, hour, minute);
   const startStemByYearStem = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0];
   const stemIndex = (startStemByYearStem[yearStemIndex] + boundary.order - 1) % 10;
   return {
     stemIndex,
     branchIndex: boundary.branch,
+    solarTerm: boundary,
   };
 }
 
-function getMonthBoundary(month, day) {
-  let selected = monthBoundaries[10];
+function getMonthBoundary(year, month, day, hour = 12, minute = 0) {
+  const birthDate = new Date(year, month - 1, day, hour ?? 12, minute ?? 0, 0, 0);
+  const candidates = [year - 1, year]
+    .flatMap((termYear) => solarTermBoundaries.map((boundary) => getSolarTermBoundary(termYear, boundary)))
+    .sort((a, b) => a.date - b.date);
+  const selected = [...candidates].reverse().find((boundary) => boundary.date <= birthDate) || candidates[candidates.length - 1];
+  return {
+    ...selected,
+    diffHours: selected ? Math.abs(birthDate - selected.date) / 3600000 : 0,
+  };
+}
 
-  for (const boundary of monthBoundaries) {
-    if (month > boundary.month || (month === boundary.month && day >= boundary.day)) {
-      selected = boundary;
+function getSolarTermBoundary(year, boundary) {
+  const calculated = getSolarTermDate(year, boundary);
+  const date = calculated || new Date(year, boundary.month - 1, boundary.fallbackDay, 0, 0, 0, 0);
+  return {
+    ...boundary,
+    year,
+    date,
+    day: date.getDate(),
+    isPrecise: Boolean(calculated),
+    source: calculated ? "태양 황경 기준 절기 시각" : "고정 날짜 fallback",
+  };
+}
+
+function getSolarTermDate(year, boundary) {
+  if (!Number.isFinite(boundary.targetLongitude)) return null;
+  let low = new Date(year, boundary.month - 1, boundary.fallbackDay - solarTermSearchWindowDays, 0, 0, 0, 0).getTime();
+  let high = new Date(year, boundary.month - 1, boundary.fallbackDay + solarTermSearchWindowDays, 23, 59, 59, 999).getTime();
+  const lowDelta = getSignedSolarLongitudeDelta(new Date(low), boundary.targetLongitude);
+  const highDelta = getSignedSolarLongitudeDelta(new Date(high), boundary.targetLongitude);
+
+  if (lowDelta > 0 || highDelta < 0) return null;
+
+  for (let i = 0; i < 52; i += 1) {
+    const mid = Math.floor((low + high) / 2);
+    const delta = getSignedSolarLongitudeDelta(new Date(mid), boundary.targetLongitude);
+    if (delta >= 0) {
+      high = mid;
+    } else {
+      low = mid;
     }
   }
 
-  return selected;
+  const date = new Date(high);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getSignedSolarLongitudeDelta(date, targetLongitude) {
+  return normalizeAngle(getApparentSolarLongitude(date) - targetLongitude + 180) - 180;
+}
+
+function getApparentSolarLongitude(date) {
+  const julianDay = date.getTime() / 86400000 + 2440587.5;
+  const t = (julianDay - 2451545.0) / 36525;
+  const geometricMeanLongitude = normalizeAngle(280.46646 + t * (36000.76983 + t * 0.0003032));
+  const meanAnomaly = 357.52911 + t * (35999.05029 - 0.0001537 * t);
+  const anomalyRad = degreesToRadians(meanAnomaly);
+  const equationOfCenter = Math.sin(anomalyRad) * (1.914602 - t * (0.004817 + 0.000014 * t))
+    + Math.sin(2 * anomalyRad) * (0.019993 - 0.000101 * t)
+    + Math.sin(3 * anomalyRad) * 0.000289;
+  const trueLongitude = geometricMeanLongitude + equationOfCenter;
+  const omega = 125.04 - 1934.136 * t;
+  return normalizeAngle(trueLongitude - 0.00569 - 0.00478 * Math.sin(degreesToRadians(omega)));
+}
+
+function normalizeAngle(angle) {
+  return positiveMod(angle, 360);
+}
+
+function degreesToRadians(degrees) {
+  return degrees * Math.PI / 180;
 }
 
 function getDayPillar(year, month, day) {
@@ -651,17 +725,41 @@ function generateAdvancedReportData(pillars, scores, input) {
   const dayStemIndex = pillars[2].stemIndex;
   const yearStem = stems[pillars[0].stemIndex];
   const forward = (input.gender === "male" && yearStem.yinYang === "양") || (input.gender === "female" && yearStem.yinYang === "음");
+  const luckStart = calculateGreatLuckStart(input, forward);
+  const solarCorrection = buildSolarCorrectionSummary(pillars);
   return {
     displayPillars: getDisplayPillars(pillars),
     deepRows: buildDeepRows(pillars, dayStemIndex),
-    greatLuck: buildGreatLuck(pillars[1], pillars[0].branchIndex, dayStemIndex, input, forward),
+    greatLuck: buildGreatLuck(pillars[1], pillars[0].branchIndex, dayStemIndex, input, forward, luckStart),
     yearlyLuck: buildYearlyLuck(pillars[0].branchIndex, dayStemIndex),
     monthlyLuck: buildMonthlyLuck(dayStemIndex, input.year),
     relations: buildRelationSummary(pillars),
     sals: buildSalSummary(pillars),
     direction: forward ? "순행" : "역행",
-    currentAge: new Date().getFullYear() - input.year + 1,
+    luckStart,
+    solarCorrection,
+    currentAge: getFullAge(input),
     scores,
+  };
+}
+
+function buildSolarCorrectionSummary(pillars) {
+  const yearCorrection = pillars[0].yearCorrection || {};
+  const monthTerm = pillars[1].solarTerm || {};
+  const nearBoundary = Number.isFinite(monthTerm.diffHours) && monthTerm.diffHours <= 24;
+  const source = yearCorrection.isPrecise && monthTerm.isPrecise ? "시각 보정" : "날짜 fallback";
+  return {
+    source,
+    appliedLabel: source,
+    yearTermName: yearCorrection.termName || "입춘",
+    yearTermDateLabel: yearCorrection.termDateLabel || "-",
+    yearApplied: Boolean(yearCorrection.applied),
+    effectiveYear: pillars[0].effectiveYear || "-",
+    monthTermName: monthTerm.name || "-",
+    monthTermDateLabel: monthTerm.date ? formatDateTime(monthTerm.date) : "-",
+    monthBranch: monthTerm.branch !== undefined ? `${branches[monthTerm.branch].hanja}${branches[monthTerm.branch].ko}` : "-",
+    nearBoundary,
+    note: nearBoundary ? "절기 경계 24시간 이내 출생으로 월주 판별에 절기 시각을 우선 반영했습니다." : "절기 시각 기준으로 월주와 년주 경계를 판별했습니다.",
   };
 }
 
@@ -694,27 +792,89 @@ function buildDeepRows(pillars, dayStemIndex) {
   });
 }
 
-function buildGreatLuck(monthPillar, yearBranchIndex, dayStemIndex, input, forward) {
+function buildGreatLuck(monthPillar, yearBranchIndex, dayStemIndex, input, forward, luckStart) {
   const monthCycle = getCycleIndex(monthPillar);
-  const startAge = 9;
+  const currentAge = getFullAge(input);
   const rows = Array.from({ length: 10 }, (_, index) => {
-    const age = startAge + index * 10;
+    const startMonths = luckStart.totalMonths + index * 120;
     const cycleIndex = positiveMod(monthCycle + (forward ? index + 1 : -(index + 1)), 60);
     const pillar = cyclePillar(cycleIndex);
+    const startDate = addMonths(getBirthDate(input), startMonths);
+    const startAgeYears = startMonths / 12;
     return {
-      age,
-      range: `${age}세`,
+      startMonths,
+      startAgeYears,
+      startAgeLabel: formatAgeFromMonths(startMonths),
       ganji: getPillarHanja(pillar),
       stem: stems[pillar.stemIndex].hanja,
       branch: branches[pillar.branchIndex].hanja,
-      startYear: input.year + age - 1,
+      startYear: startDate.getFullYear(),
+      startDateLabel: formatYearMonth(startDate),
       direction: forward ? "순행" : "역행",
-      current: new Date().getFullYear() - input.year + 1 >= age && new Date().getFullYear() - input.year + 1 < age + 10 ? "●" : "",
+      current: currentAge >= startAgeYears && currentAge < startAgeYears + 10 ? "●" : "",
       sal: getTwelveSal(yearBranchIndex, pillar.branchIndex),
       lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
     };
   });
   return forward ? rows : rows.reverse();
+}
+
+function calculateGreatLuckStart(input, forward) {
+  const birthDate = getBirthDate(input);
+  const termCandidates = [birthDate.getFullYear() - 1, birthDate.getFullYear(), birthDate.getFullYear() + 1]
+    .flatMap((year) => solarTermBoundaries.map((boundary) => getSolarTermBoundary(year, boundary)))
+    .sort((a, b) => a.date - b.date);
+  const target = forward
+    ? termCandidates.find((term) => term.date > birthDate)
+    : [...termCandidates].reverse().find((term) => term.date < birthDate);
+  const diffMs = target ? Math.abs(target.date - birthDate) : 0;
+  const diffDays = diffMs / 86400000;
+  const totalMonths = Math.max(1, Math.round(diffDays * 4));
+
+  return {
+    totalMonths,
+    years: Math.floor(totalMonths / 12),
+    months: totalMonths % 12,
+    ageLabel: formatAgeFromMonths(totalMonths),
+    termName: target?.name || "-",
+    termDateLabel: target ? formatDateTime(target.date) : "-",
+    diffDays,
+    source: target?.source || "-",
+  };
+}
+
+function getBirthDate(input) {
+  return new Date(input.year, input.month - 1, input.day, input.hour ?? 12, input.minute ?? 0, 0, 0);
+}
+
+function getFullAge(input) {
+  const today = new Date();
+  let age = today.getFullYear() - input.year;
+  const birthdayThisYear = new Date(today.getFullYear(), input.month - 1, input.day);
+  if (today < birthdayThisYear) age -= 1;
+  return Math.max(0, age);
+}
+
+function addMonths(date, months) {
+  const next = new Date(date);
+  next.setMonth(next.getMonth() + months);
+  return next;
+}
+
+function formatAgeFromMonths(totalMonths) {
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  if (years === 0) return `만 ${months}개월`;
+  if (months === 0) return `만 ${years}년`;
+  return `만 ${years}년 ${months}개월`;
+}
+
+function formatYearMonth(date) {
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function formatDateTime(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
 function buildYearlyLuck(yearBranchIndex, dayStemIndex) {
@@ -874,21 +1034,39 @@ function renderAdvancedReport(result, input) {
     { label: "시주", value: hourPillarName, detail: "내면과 후반 흐름" },
     { label: "강한 오행", value: strongest, detail: "자주 드러나는 기운" },
     { label: "보완 오행", value: deficient, detail: "의식적으로 채울 기운" },
-    { label: "대운", value: data.direction, detail: `현재 ${data.currentAge}세 기준` },
+    { label: "절기 보정", value: data.solarCorrection.appliedLabel, detail: `월주 ${data.solarCorrection.monthTermName}` },
+    { label: "대운", value: data.direction, detail: `초운 ${data.luckStart.ageLabel}` },
     { label: "올해 세운", value: currentYearLuck.ganji, detail: `${currentYearLuck.year}년 · ${currentYearLuck.sal}` },
   ];
   return `
-    <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(getBirthInputLabel(input))}${input.calendarType === "lunar" ? ` · ${escapeHtml(getSolarConversionLabel(input))}` : ""} · ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 현재 ${escapeHtml(data.currentAge)}세</div>
+    <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(getBirthInputLabel(input))}${input.calendarType === "lunar" ? ` · ${escapeHtml(getSolarConversionLabel(input))}` : ""} · ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 초운 ${escapeHtml(data.luckStart.ageLabel)} · 대운 기준절기 ${escapeHtml(data.luckStart.termName)}(${escapeHtml(data.luckStart.termDateLabel)}) · 현재 만 ${escapeHtml(data.currentAge)}세</div>
+    ${renderSolarCorrection(data.solarCorrection)}
     ${renderReportOverview(overviewItems)}
     ${renderReportTable("사주 4주", pillarColumns, [pillarValues])}
     ${renderReportTable("오행 분포", elementOrder.map((element) => elementInfo[element].label), [elementValues])}
     ${renderReportTable("심층 분석: 십성 & 12운성", ["구분", ...pillarColumns], deepRows)}
-    ${renderReportTable("대운", ["나이범위", "간지", "천간", "지지", "시작연도", "방향", "현재", "신살", "12운성"], data.greatLuck.map((row) => [row.range, row.ganji, row.stem, row.branch, row.startYear, row.direction, row.current, row.sal, row.lifeStage]))}
+    ${renderReportTable("대운", ["시작나이", "간지", "천간", "지지", "시작시점", "방향", "현재", "신살", "12운성"], data.greatLuck.map((row) => [row.startAgeLabel, row.ganji, row.stem, row.branch, row.startDateLabel, row.direction, row.current, row.sal, row.lifeStage]))}
     ${renderReportTable("세운", ["연도", "간지", "천간", "지지", "신살", "12운성"], data.yearlyLuck.map((row) => [row.year, row.ganji, row.stem, row.branch, row.sal, row.lifeStage]))}
     ${renderReportTable("월운", ["월", "월명", "간지", "천간", "지지", "신살", "12운성", "천간십성", "지지십성", "절기"], data.monthlyLuck.map((row) => [row.month, row.name, row.ganji, row.stem, row.branch, row.sal, row.lifeStage, row.stemTenGod, row.branchTenGod, row.term]))}
     ${renderReportTable("천간 특수관계", ["유형", "관계쌍", "기둥", "설명"], heavenlyRows)}
     ${renderReportTable("지지 형·충·회·합 해석", ["구분", ...pillarColumns], branchRelationRows)}
     ${renderReportTable("종합 신살", ["구분", ...pillarColumns], salRows)}
+  `;
+}
+
+function renderSolarCorrection(correction) {
+  return `
+    <div class="solar-correction-card">
+      <div>
+        <span>절기 보정</span>
+        <strong>${escapeHtml(correction.appliedLabel)}</strong>
+      </div>
+      <dl>
+        <div><dt>년주 기준</dt><dd>${escapeHtml(correction.yearTermName)} · ${escapeHtml(correction.yearTermDateLabel)} · 적용년 ${escapeHtml(correction.effectiveYear)}</dd></div>
+        <div><dt>월주 기준</dt><dd>${escapeHtml(correction.monthTermName)} · ${escapeHtml(correction.monthTermDateLabel)} · ${escapeHtml(correction.monthBranch)}</dd></div>
+        <div><dt>판별 메모</dt><dd>${escapeHtml(correction.note)}</dd></div>
+      </dl>
+    </div>
   `;
 }
 

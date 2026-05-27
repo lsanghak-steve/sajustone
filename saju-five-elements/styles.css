@@ -49,6 +49,30 @@ input {
   margin-bottom: 28px;
 }
 
+.intro-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.intro-meta .eyebrow {
+  margin-bottom: 0;
+}
+
+.app-version {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--muted);
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
 .eyebrow {
   margin: 0 0 10px;
   color: var(--earth);
@@ -861,6 +885,59 @@ h1 {
   line-height: 1.7;
 }
 
+
+.solar-correction-card {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.75fr) minmax(0, 2.25fr);
+  gap: 14px;
+  margin: 0 0 18px;
+  border: 1px solid #d9e2d1;
+  border-radius: 8px;
+  background: #fbfdf8;
+  padding: 14px;
+}
+
+.solar-correction-card > div:first-child {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border-right: 1px solid #dfe7d6;
+  padding-right: 14px;
+}
+
+.solar-correction-card span,
+.solar-correction-card dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.solar-correction-card strong {
+  color: var(--wood);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.solar-correction-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.solar-correction-card dl div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.solar-correction-card dd {
+  margin: 0;
+  color: #4f5a45;
+  font-size: 13px;
+  line-height: 1.55;
+  word-break: keep-all;
+}
 .report-overview {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1005,6 +1082,20 @@ h1 {
     justify-self: center;
   }
 
+
+  .solar-correction-card {
+    grid-template-columns: 1fr;
+  }
+
+  .solar-correction-card > div:first-child {
+    border-right: 0;
+    border-bottom: 1px solid #dfe7d6;
+    padding: 0 0 12px;
+  }
+
+  .solar-correction-card dl div {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
   .stones-gallery,
   .stone-list,
   .report-overview,
@@ -1024,6 +1115,7 @@ h1 {
   .actions {
     grid-template-columns: 1fr;
   }
+
 
   .stones-gallery,
   .stone-list,
