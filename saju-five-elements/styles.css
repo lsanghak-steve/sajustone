@@ -1093,6 +1093,17 @@ h1 {
   line-height: 1.5;
 }
 
+.mobile-report-cards {
+  display: none;
+}
+
+.report-scroll-hint {
+  display: none;
+  margin: -2px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
 .report-table-block {
   margin-top: 16px;
 }
@@ -1178,6 +1189,21 @@ h1 {
 .report-table th:last-child {
   border-right: 0;
 }
+
+.report-table-wrap:focus {
+  outline: 2px solid #d8b36a;
+  outline-offset: 2px;
+}
+
+.report-table tr.is-current td {
+  background: #f7edd8;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.report-table tr.is-current td:first-child {
+  background: #ecd59e;
+}
 @media (max-width: 900px) {
   .app-shell {
     width: min(100% - 24px, 680px);
@@ -1224,6 +1250,83 @@ h1 {
   .symbolic-star-card > div:first-child {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .mobile-report-cards {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .mobile-report-card {
+    display: grid;
+    gap: 5px;
+    border: 1px solid #e4d7c2;
+    border-radius: 8px;
+    background: #fff8ec;
+    padding: 12px;
+  }
+
+  .mobile-report-card span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .mobile-report-card strong {
+    color: var(--ink);
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .mobile-report-card em {
+    color: #665c4d;
+    font-size: 12px;
+    font-style: normal;
+    line-height: 1.45;
+  }
+
+  .mobile-report-card div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 3px;
+  }
+
+  .mobile-report-card b {
+    border-radius: 999px;
+    background: #edf4e9;
+    color: var(--wood);
+    padding: 4px 8px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .report-scroll-hint {
+    display: block;
+  }
+
+  .report-table-wrap {
+    box-shadow: inset -18px 0 20px -24px rgba(92, 81, 68, 0.9);
+    scroll-snap-type: x proximity;
+  }
+
+  .report-table {
+    min-width: 720px;
+    font-size: 11px;
+  }
+
+  .report-table th,
+  .report-table td {
+    min-width: 64px;
+    padding: 8px 9px;
+    white-space: normal;
+    word-break: keep-all;
+  }
+
+  .report-table th:first-child,
+  .report-table td:first-child {
+    min-width: 78px;
   }
   .stones-gallery,
   .stone-list,

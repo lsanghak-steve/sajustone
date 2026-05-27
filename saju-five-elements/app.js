@@ -462,61 +462,61 @@ function renderCalendarInfo(result, input) {
 }
 const stoneRecommendations = {
   wood: {
-    image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF",
+    image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c",
     title: "목(木) 기운 추천석",
     tone: "초록 계열",
     summary: "성장, 시작, 회복, 기획의 기운을 상징합니다.",
     stones: [
-      { name: "그린 아벤츄린", color: "#3f9f6a", image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF", meaning: "새로운 시작과 안정적인 성장을 상징하는 천연석입니다." },
+      { name: "그린 아벤츄린", color: "#3f9f6a", image: "./assets/stone-gallery/GreenAventurine.png", bracelet: "./assets/bracelet-gallery/GreenAventurine_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c", meaning: "새로운 시작과 안정적인 성장을 상징하는 천연석입니다." },
       { name: "말라카이트", color: "#1f7a4d", image: "./assets/stone-gallery/Malachite.png", bracelet: "./assets/bracelet-gallery/Malachite_bra.png", meaning: "정체된 흐름을 바꾸고 변화의 용기를 돕는 상징석입니다." },
       { name: "페리도트", color: "#8abf45", image: "./assets/stone-gallery/Peridot.png", bracelet: "./assets/bracelet-gallery/Peridot_bra.png", meaning: "가벼운 활력과 긍정적인 회복감을 더하는 데 어울립니다." },
     ],
     tip: "목 기운이 부족할 때는 초록색 포인트나 식물 가까이에 두는 방식이 잘 어울립니다.",
   },
   fire: {
-    image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF",
+    image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c",
     title: "화(火) 기운 추천석",
     tone: "붉은 계열",
     summary: "표현, 열정, 활력, 자신감의 기운을 상징합니다.",
     stones: [
-      { name: "가넷", color: "#8f1d2c", image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF", meaning: "집중력과 지속적인 열정을 상징하는 붉은 천연석입니다." },
+      { name: "가넷", color: "#8f1d2c", image: "./assets/stone-gallery/Garnet.png", bracelet: "./assets/bracelet-gallery/Garnet_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c", meaning: "집중력과 지속적인 열정을 상징하는 붉은 천연석입니다." },
       { name: "카넬리안", color: "#d85f2a", image: "./assets/stone-gallery/Carnelian.png", bracelet: "./assets/bracelet-gallery/Carnelian_bra.png", meaning: "표현력과 행동력을 깨우는 따뜻한 에너지의 상징석입니다." },
       { name: "레드 재스퍼", color: "#ad3f32", image: "./assets/stone-gallery/RedJasper.png", bracelet: "./assets/bracelet-gallery/RedJasper_bra.png", meaning: "흔들림 없는 활력과 실행력을 보완하는 데 어울립니다." },
     ],
     tip: "화 기운이 부족할 때는 발표, 만남, 중요한 시작이 있는 날에 붉은 계열 스톤을 포인트로 쓰면 좋습니다.",
   },
   earth: {
-    image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF",
+    image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c",
     title: "토(土) 기운 추천석",
     tone: "노랑·갈색 계열",
     summary: "안정, 균형, 현실감, 신뢰의 기운을 상징합니다.",
     stones: [
-      { name: "타이거 아이", color: "#b4772f", image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF", meaning: "현실 감각과 중심을 잡는 힘을 상징하는 천연석입니다." },
+      { name: "타이거 아이", color: "#b4772f", image: "./assets/stone-gallery/TigerEye.png", bracelet: "./assets/bracelet-gallery/TigerEye_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c", meaning: "현실 감각과 중심을 잡는 힘을 상징하는 천연석입니다." },
       { name: "시트린", color: "#e0ad32", image: "./assets/stone-gallery/Citrine.png", bracelet: "./assets/bracelet-gallery/Citrine_bra.png", meaning: "밝은 자신감과 결과를 만드는 감각을 보완하는 데 어울립니다." },
       { name: "스모키 쿼츠", color: "#756050", image: "./assets/stone-gallery/SmokyQuartz.png", bracelet: "./assets/bracelet-gallery/SmokyQuartz_bra.png", meaning: "불안정한 마음을 가라앉히고 차분한 판단을 상징합니다." },
     ],
     tip: "토 기운이 부족할 때는 책상, 지갑, 업무 공간처럼 현실적인 결정을 하는 곳에 두기 좋습니다.",
   },
   metal: {
-    image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF",
+    image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c",
     title: "금(金) 기운 추천석",
     tone: "흰색·금속성 계열",
     summary: "정리, 결단, 집중, 보호의 기운을 상징합니다.",
     stones: [
-      { name: "클리어 쿼츠", color: "#d9dde0", image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF", meaning: "생각을 맑게 정리하고 방향성을 세우는 상징석입니다." },
+      { name: "클리어 쿼츠", color: "#d9dde0", image: "./assets/stone-gallery/ClearQuartz.png", bracelet: "./assets/bracelet-gallery/ClearQuartz_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c", meaning: "생각을 맑게 정리하고 방향성을 세우는 상징석입니다." },
       { name: "헤마타이트", color: "#4d5356", image: "./assets/stone-gallery/Hematite.png", bracelet: "./assets/bracelet-gallery/Hematite_bra.png", meaning: "흐트러진 에너지를 모으고 단단한 집중을 돕는 이미지가 있습니다." },
       { name: "화이트 하울라이트", color: "#f0eee8", image: "./assets/stone-gallery/WhiteHowlite.png", bracelet: "./assets/bracelet-gallery/WhiteHowlite_bra.png", meaning: "차분함과 절제, 감정 정리를 상징하는 흰색 계열 천연석입니다." },
     ],
     tip: "금 기운이 부족할 때는 중요한 선택, 정리, 계약, 계획 수립 시 가까이 두는 방식이 어울립니다.",
   },
   water: {
-    image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF",
+    image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c",
     title: "수(水) 기운 추천석",
     tone: "파랑·검정 계열",
     summary: "지혜, 유연함, 감정 정화, 휴식의 기운을 상징합니다.",
     stones: [
       { name: "아쿠아마린", color: "#7fbfd1", image: "./assets/stone-gallery/Aquamarine.png", bracelet: "./assets/bracelet-gallery/Aquamarine_bra.png", meaning: "부드러운 소통과 감정의 흐름을 상징하는 파란 천연석입니다." },
-      { name: "라피스 라줄리", color: "#264a9b", image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae/products/13198469969?nl-ts-pid=jmTp0dqos5wssNkfsXR-078576&NaPm=ct%3Dmpmpq3z3%7Cci%3DCnRsbQAAAZ5kn1orAH57Ng%2E%2E02%7Ctr%3Dpmax%7Chk%3D0df335c9e0b65ba8a66532f86fe5aa785ab74218%7Cnacn%3DeeGcHwAeCbYJF", meaning: "깊은 통찰과 내면의 지혜를 떠올리게 하는 상징석입니다." },
+      { name: "라피스 라줄리", color: "#264a9b", image: "./assets/stone-gallery/LapisLazuli.png", bracelet: "./assets/bracelet-gallery/LapisLazuli_bra.png", purchaseUrl: "https://smartstore.naver.com/diachae?NaPm=ct%3Dmpo5j9bu%7Cci%3Dcheckout%7Ctr%3Dds%7Ctrx%3Dnull%7Chk%3Db00418db51d707d34d9320c483da8a52aeaaad8c", meaning: "깊은 통찰과 내면의 지혜를 떠올리게 하는 상징석입니다." },
       { name: "블랙 옵시디언", color: "#1b1b1d", image: "./assets/stone-gallery/BlackObsidian.png", bracelet: "./assets/bracelet-gallery/BlackObsidian_bra.png", meaning: "복잡한 마음을 비우고 보호의 이미지를 더하는 데 어울립니다." },
     ],
     tip: "수 기운이 부족할 때는 휴식 공간, 명상 시간, 잠들기 전 루틴과 함께 활용하기 좋습니다.",
@@ -925,6 +925,7 @@ function buildYearlyLuck(yearBranchIndex, dayStemIndex) {
       branch: branches[pillar.branchIndex].hanja,
       sal: getTwelveSal(yearBranchIndex, pillar.branchIndex),
       lifeStage: getLifeStage(dayStemIndex, pillar.branchIndex),
+      current: year === currentYear ? "●" : "",
     };
   });
 }
@@ -1165,8 +1166,19 @@ function renderAdvancedReport(result, input) {
   const deficient = result.deficient.map((element) => elementInfo[element].label).join(", ");
   const dayPillarName = getPillarHanja(result.pillars[2]);
   const hourPillarName = result.pillars[3].empty ? "시간 미입력" : getPillarHanja(result.pillars[3]);
+  const currentGreatLuck = data.greatLuck.find((row) => row.current) || data.greatLuck[0];
   const currentYearLuck = data.yearlyLuck.find((row) => row.year === new Date().getFullYear()) || data.yearlyLuck[data.yearlyLuck.length - 1];
+  const currentMonthLuck = data.monthlyLuck.find((row) => row.month === new Date().getMonth() + 1) || data.monthlyLuck[0];
   const symbolicStarNames = data.symbolicStars.length ? data.symbolicStars.map((star) => star.name).slice(0, 3).join(", ") : "특이 신살 약함";
+  const greatLuckMobileCards = [
+    { title: "현재 대운", value: currentGreatLuck.ganji, meta: `${currentGreatLuck.startAgeLabel} 시작 · ${currentGreatLuck.startDateLabel}`, chips: [currentGreatLuck.direction, currentGreatLuck.sal, currentGreatLuck.lifeStage] },
+  ];
+  const yearlyLuckMobileCards = [
+    { title: "현재 세운", value: currentYearLuck.ganji, meta: `${currentYearLuck.year}년`, chips: [currentYearLuck.stem, currentYearLuck.branch, currentYearLuck.sal, currentYearLuck.lifeStage] },
+  ];
+  const monthlyLuckMobileCards = [
+    { title: "이번 달 월운", value: currentMonthLuck.ganji, meta: `${currentMonthLuck.name} · ${currentMonthLuck.term}`, chips: [currentMonthLuck.stemTenGod, currentMonthLuck.branchTenGod, currentMonthLuck.sal] },
+  ];
   const overviewItems = [
     { label: "일주", value: dayPillarName, detail: "나 자신과 관계 방식" },
     { label: "시주", value: hourPillarName, detail: "내면과 후반 흐름" },
@@ -1181,12 +1193,14 @@ function renderAdvancedReport(result, input) {
     <div class="report-note">입력 기준: ${escapeHtml(genderText)} · ${escapeHtml(getBirthInputLabel(input))}${input.calendarType === "lunar" ? ` · ${escapeHtml(getSolarConversionLabel(input))}` : ""} · ${input.hour === null ? "출생시간 모름" : `${escapeHtml(String(input.hour).padStart(2, "0"))}:${escapeHtml(String(input.minute).padStart(2, "0"))}`} · 대운 방향 ${escapeHtml(data.direction)} · 초운 ${escapeHtml(data.luckStart.ageLabel)} · 대운 기준절기 ${escapeHtml(data.luckStart.termName)}(${escapeHtml(data.luckStart.termDateLabel)}) · 현재 만 ${escapeHtml(data.currentAge)}세</div>
     ${renderSolarCorrection(data.solarCorrection)}
     ${renderReportOverview(overviewItems)}
+    ${renderHiddenStemStructure(data.deepRows)}
+    ${renderSymbolicStars(data.symbolicStars)}
     ${renderReportTable("사주 4주", pillarColumns, [pillarValues])}
     ${renderReportTable("오행 분포", elementOrder.map((element) => elementInfo[element].label), [elementValues])}
     ${renderReportTable("심층 분석: 십성 & 12운성", ["구분", ...pillarColumns], deepRows)}
-    ${renderReportTable("대운", ["시작나이", "간지", "천간", "지지", "시작시점", "방향", "현재", "신살", "12운성"], data.greatLuck.map((row) => [row.startAgeLabel, row.ganji, row.stem, row.branch, row.startDateLabel, row.direction, row.current, row.sal, row.lifeStage]))}
-    ${renderReportTable("세운", ["연도", "간지", "천간", "지지", "신살", "12운성"], data.yearlyLuck.map((row) => [row.year, row.ganji, row.stem, row.branch, row.sal, row.lifeStage]))}
-    ${renderReportTable("월운", ["월", "월명", "간지", "천간", "지지", "신살", "12운성", "천간십성", "지지십성", "절기"], data.monthlyLuck.map((row) => [row.month, row.name, row.ganji, row.stem, row.branch, row.sal, row.lifeStage, row.stemTenGod, row.branchTenGod, row.term]))}
+    ${renderReportTable("대운", ["시작나이", "간지", "천간", "지지", "시작시점", "방향", "현재", "신살", "12운성"], data.greatLuck.map((row) => [row.startAgeLabel, row.ganji, row.stem, row.branch, row.startDateLabel, row.direction, row.current, row.sal, row.lifeStage]), { mobileCards: greatLuckMobileCards })}
+    ${renderReportTable("세운", ["연도", "간지", "천간", "지지", "현재", "신살", "12운성"], data.yearlyLuck.map((row) => [row.year, row.ganji, row.stem, row.branch, row.current, row.sal, row.lifeStage]), { mobileCards: yearlyLuckMobileCards })}
+    ${renderReportTable("월운", ["월", "월명", "간지", "천간", "지지", "신살", "12운성", "천간십성", "지지십성", "절기"], data.monthlyLuck.map((row) => [row.month, row.name, row.ganji, row.stem, row.branch, row.sal, row.lifeStage, row.stemTenGod, row.branchTenGod, row.term]), { mobileCards: monthlyLuckMobileCards })}
     ${renderReportTable("천간 특수관계", ["유형", "관계쌍", "기둥", "설명"], heavenlyRows)}
     ${renderReportTable("지지 형·충·회·합 해석", ["구분", ...pillarColumns], branchRelationRows)}
     ${renderReportTable("종합 신살", ["구분", ...pillarColumns], salRows)}
@@ -1271,16 +1285,37 @@ function renderReportOverview(items) {
     </div>
   `;
 }
-function renderReportTable(title, columns, rows) {
+function renderReportTable(title, columns, rows, options = {}) {
   return `
     <div class="report-table-block">
       <h4><span>${escapeHtml(title)}</span><small>${rows.length}행</small></h4>
-      <div class="report-table-wrap">
+      ${renderMobileReportCards(options.mobileCards || [])}
+      <p class="report-scroll-hint">좌우로 밀어 전체 항목을 확인하세요.</p>
+      <div class="report-table-wrap" tabindex="0" aria-label="${escapeHtml(title)} 표 좌우 스크롤 영역">
         <table class="report-table">
           <thead><tr>${columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead>
-          <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell ?? "")}</td>`).join("")}</tr>`).join("")}</tbody>
+          <tbody>${rows.map((row) => {
+            const isCurrent = row.some((cell) => cell === "●");
+            return `<tr${isCurrent ? ` class="is-current"` : ""}>${row.map((cell) => `<td>${escapeHtml(cell ?? "")}</td>`).join("")}</tr>`;
+          }).join("")}</tbody>
         </table>
       </div>
+    </div>
+  `;
+}
+
+function renderMobileReportCards(cards) {
+  if (!cards.length) return "";
+  return `
+    <div class="mobile-report-cards">
+      ${cards.map((card) => `
+        <article class="mobile-report-card">
+          <span>${escapeHtml(card.title)}</span>
+          <strong>${escapeHtml(card.value)}</strong>
+          <em>${escapeHtml(card.meta)}</em>
+          <div>${card.chips.map((chip) => `<b>${escapeHtml(chip)}</b>`).join("")}</div>
+        </article>
+      `).join("")}
     </div>
   `;
 }
